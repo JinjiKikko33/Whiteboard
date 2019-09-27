@@ -80,7 +80,6 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 		case DRAW:
 			for (int j=0; j<undermouse.size();j++) {
 				ArrayList<point> curr = undermouse.get(j);
-				System.out.println(curr);
 				
 				Color c = color_his.get(j);
 				for (int i=1; i<curr.size(); i++) {
