@@ -9,20 +9,29 @@ import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JSlider;
 import javax.swing.JTextField;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 class GUI extends JFrame { 
 
 
     shape canvas1 = new shape();
+    
+
     
     public GUI() {
     	//drawing buttons
@@ -60,12 +69,58 @@ class GUI extends JFrame {
 	    	    canvas1.setShape(shape.DRAW);
 	    	}
 	    });
+	  
+	    drawButton.addMouseListener(new MouseAdapter(){
+	        @Override
+	        public void mouseClicked(MouseEvent e){
+	            if(e.getClickCount()==2){
+	            	JFrame parent = new JFrame();
+		    	    JOptionPane sliderPane = new JOptionPane();
+		    	    JSlider slider = SliderMaker.getSlider(sliderPane);
+		    	    sliderPane.setMessage(new Object[] { "", slider });
+		    	    sliderPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+		    	    JDialog dialog = sliderPane.createDialog(parent, "Pen Thickness");
+		    	    dialog.setVisible(true);
+		    	    
+		    	    if (sliderPane.getInputValue().equals("uninitializedValue")) {
+			    	    canvas1.setPenThickness(-1);    		
+		    	    } else {
+			    	    canvas1.setPenThickness((int) sliderPane.getInputValue());
+		    	    }
+	            }
+	        }
+	    });
 	    
+	 
 	    JButton clearButton = new JButton("Eraser");
 	    clearButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
-	    	    canvas1.setShape(shape.CLEAR);
+	    		canvas1.setShape(shape.CLEAR);	    	    
 	    	}
+	    });
+	    
+	    
+	    /* TODO: Combine both event listeners to one (one mouseclick will be enough
+	    * to set the canvas shape to CLEAR
+	    */
+	    clearButton.addMouseListener(new MouseAdapter(){
+	        @Override
+	        public void mouseClicked(MouseEvent e){
+	            if(e.getClickCount()==2){
+	            	JFrame parent = new JFrame();
+		    	    JOptionPane sliderPane = new JOptionPane();
+		    	    JSlider slider = SliderMaker.getSlider(sliderPane);
+		    	    sliderPane.setMessage(new Object[] { "", slider });
+		    	    sliderPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+		    	    JDialog dialog = sliderPane.createDialog(parent, "Eraser Thickness");
+		    	    dialog.setVisible(true);
+		    	    if (sliderPane.getInputValue().equals("uninitializedValue")) {
+			    	    canvas1.setEraserThickness(-1);    		
+		    	    } else {
+			    	    canvas1.setEraserThickness((int) sliderPane.getInputValue());    		
+		    	    }
+	            }
+	        }
 	    });
 	    
 	    JButton colorButton = new JButton("Color");
@@ -80,7 +135,6 @@ class GUI extends JFrame {
 	    JButton textButton = new JButton("Text");
 	    textButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
-
 	    	}
 	    });
 	    
@@ -112,6 +166,16 @@ class GUI extends JFrame {
 
 	    	}
 	    });
+	    
+	    JButton connectToButton = new JButton("Connect");
+	    connectToButton.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e){
+
+	    	}
+	    });
+	    
+	    
+	    
 
 	    //main panel layout
 	    JPanel buttonPanel = new JPanel();
@@ -158,6 +222,10 @@ class GUI extends JFrame {
 	    //overall layout
 	    JPanel main = new JPanel();
 	    main.setLayout(new BorderLayout());
+	    
+	    
+	    
+	    
 	    main.add(canvas1, BorderLayout.CENTER);
 	    main.add(buttonPanel, BorderLayout.SOUTH);
 	    main.add(filePanel, BorderLayout.NORTH);
@@ -165,8 +233,11 @@ class GUI extends JFrame {
 	    Container content = this.getContentPane();
 	    content.setLayout(new FlowLayout());
 	    
+	    
 	    content.add(main);
 	    content.add(sidePanel);
+	    
+
 	
 	    this.pack();
     }

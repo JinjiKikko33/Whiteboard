@@ -33,6 +33,8 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 	private Color pen = Color.black;
 	private Color bg = Color.white;
 	private ArrayList<Color> color_his = new ArrayList<>();
+	private int eraserThickness = 3;
+	private int penThickness = 3; 
 	
 	public static final int DRAW = 0;
 	public static final int LINE = 1;
@@ -58,6 +60,18 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 		this.pen = c;
 	}
 
+	public void setEraserThickness(int thickness) {
+		if (thickness != -1) {
+			this.eraserThickness = thickness;
+		}
+	}
+	
+	public void setPenThickness(int thickness) {
+		if (thickness != -1) {
+			this.penThickness = thickness;
+		}
+	}
+	
 	public void paint(Graphics g)
 
 	{
@@ -86,10 +100,11 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 					point point1 = curr.get(i-1);
 					point point2 = curr.get(i);
 					g2.setColor(c);
+					g2.setStroke(new BasicStroke(this.penThickness));
 					g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 				}
 			}
-			
+		
 			for (int i=1; i<eraser.size(); i++) {
 				point point1 = eraser.get(i-1);
 				point point2 = eraser.get(i);
@@ -97,7 +112,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 					continue;
 				}
 				g2.setColor(bg);
-				g2.setStroke(new BasicStroke(3));
+				g2.setStroke(new BasicStroke(this.eraserThickness));
 				g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 			}
 			break;
@@ -125,7 +140,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 					continue;
 				}
 				g2.setColor(bg);
-				g2.setStroke(new BasicStroke(3));
+				g2.setStroke(new BasicStroke(this.eraserThickness));
 				g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 			}
 			break;
