@@ -76,7 +76,7 @@ class GUI extends JFrame {
 	            if(e.getClickCount()==2){
 	            	JFrame parent = new JFrame();
 		    	    JOptionPane sliderPane = new JOptionPane();
-		    	    JSlider slider = SliderMaker.getSlider(sliderPane);
+		    	    JSlider slider = SliderMaker.getSlider(sliderPane, canvas1.getPenThickness());
 		    	    sliderPane.setMessage(new Object[] { "", slider });
 		    	    sliderPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 		    	    JDialog dialog = sliderPane.createDialog(parent, "Pen Thickness");
@@ -109,7 +109,7 @@ class GUI extends JFrame {
 	            if(e.getClickCount()==2){
 	            	JFrame parent = new JFrame();
 		    	    JOptionPane sliderPane = new JOptionPane();
-		    	    JSlider slider = SliderMaker.getSlider(sliderPane);
+		    	    JSlider slider = SliderMaker.getSlider(sliderPane, canvas1.getEraserThickness());
 		    	    sliderPane.setMessage(new Object[] { "", slider });
 		    	    sliderPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 		    	    JDialog dialog = sliderPane.createDialog(parent, "Eraser Thickness");

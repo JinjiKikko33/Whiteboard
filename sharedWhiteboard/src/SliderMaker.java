@@ -5,8 +5,9 @@ import javax.swing.event.ChangeListener;
 
 public class SliderMaker {
 	
-    static JSlider getSlider(final JOptionPane optionPane) {
-        JSlider GUISlider = new JSlider(3, 80, 10);
+    static JSlider getSlider(final JOptionPane optionPane, int markerValue) {
+        
+    	JSlider GUISlider = new JSlider(3, 80, markerValue);
 
         ChangeListener listener = new ChangeListener() {
           public void stateChanged(ChangeEvent changeEvent) {

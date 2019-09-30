@@ -72,6 +72,14 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 		}
 	}
 	
+	public int getEraserThickness() {
+		return this.eraserThickness;
+	}
+	
+	public int getPenThickness() {
+		return this.penThickness;
+	}
+	
 	public void paint(Graphics g)
 
 	{
