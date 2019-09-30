@@ -100,6 +100,18 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 	private void drawShape(Graphics2D g2) {
 		switch (shape) {
 		case DRAW:
+			
+			for (int i=1; i<eraser.size(); i++) {
+				point point1 = eraser.get(i-1);
+				point point2 = eraser.get(i);
+				if (stop_eraser.contains(point1)) {
+					continue;
+				}
+				g2.setColor(bg);
+				g2.setStroke(new BasicStroke(this.eraserThickness));
+				g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
+			}
+			
 			for (int j=0; j<undermouse.size();j++) {
 				ArrayList<point> curr = undermouse.get(j);
 				
@@ -113,16 +125,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 				}
 			}
 		
-			for (int i=1; i<eraser.size(); i++) {
-				point point1 = eraser.get(i-1);
-				point point2 = eraser.get(i);
-				if (stop_eraser.contains(point1)) {
-					continue;
-				}
-				g2.setColor(bg);
-				g2.setStroke(new BasicStroke(this.eraserThickness));
-				g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
-			}
+
 			break;
 		case LINE:
 			g2.setColor(pen);
@@ -141,6 +144,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 			g2.drawArc(startX, startY, endX - startX, (startY + endX - startX) - startY, 0, 360);
 			break;
 		case CLEAR:					
+			
 			for (int i=1; i<eraser.size(); i++) {
 				point point1 = eraser.get(i-1);
 				point point2 = eraser.get(i);
@@ -151,6 +155,8 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 				g2.setStroke(new BasicStroke(this.eraserThickness));
 				g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 			}
+			
+
 			break;
 		default:
 			break;
@@ -174,7 +180,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 				ArrayList<point> last = undermouse.get(undermouse.size()-1);
 				last.add(new point(e.getX(), e.getY()));
 			
-		} else if (shape==5) {
+		} if (shape==5) {
 			eraser.add(new point(e.getX(), e.getY()));			
 		}else {
 			endX = e.getX(); 
@@ -188,6 +194,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 		drawShape(grafarea);
 		if(shape==5) {
 			stop_eraser.add(new point(e.getX(),e.getY()));
+			eraser = new ArrayList<>();
 		}else {
 			endX = e.getX(); 
 			endY = e.getY();
