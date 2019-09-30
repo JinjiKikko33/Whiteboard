@@ -32,7 +32,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 	
 	private Color pen = Color.black;
 	private Color bg = Color.white;
-	private ArrayList<Color> color_his = new ArrayList<>();
+	//private ArrayList<Color> color_his = new ArrayList<>();
 	private int eraserThickness = 3;
 	private int penThickness = 3; 
 	
@@ -95,11 +95,11 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 			for (int j=0; j<undermouse.size();j++) {
 				ArrayList<point> curr = undermouse.get(j);
 				
-				Color c = color_his.get(j);
+				//Color c = color_his.get(j);
 				for (int i=1; i<curr.size(); i++) {
 					point point1 = curr.get(i-1);
 					point point2 = curr.get(i);
-					g2.setColor(c);
+					g2.setColor(this.pen);
 					g2.setStroke(new BasicStroke(this.penThickness));
 					g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 				}
@@ -132,7 +132,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 			g2.setColor(pen);
 			g2.drawArc(startX, startY, endX - startX, (startY + endX - startX) - startY, 0, 360);
 			break;
-		case CLEAR:			
+		case CLEAR:					
 			for (int i=1; i<eraser.size(); i++) {
 				point point1 = eraser.get(i-1);
 				point point2 = eraser.get(i);
@@ -154,10 +154,11 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 		startY = e.getY(); 
 		endX = startX;
 		endY = startY;
+		undermouse = new ArrayList<>();
 		ArrayList<point> last = new ArrayList<>();
 		undermouse.add(last);
 		last.add(new point(e.getX(), e.getY()));
-		color_his.add(pen);		
+		//color_his.add(pen);		
 	}
 
 	public void mouseDragged(MouseEvent e) {
@@ -165,7 +166,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 				ArrayList<point> last = undermouse.get(undermouse.size()-1);
 				last.add(new point(e.getX(), e.getY()));
 			
-		}else if (shape==5) {
+		} else if (shape==5) {
 			eraser.add(new point(e.getX(), e.getY()));			
 		}else {
 			endX = e.getX(); 
