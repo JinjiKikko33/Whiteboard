@@ -41,6 +41,8 @@ class GUI extends JFrame {
 	    		canvas1.setShape(shape.OVAL);
 	    	}
 	    });
+	    ovalButton.setFocusable(false);
+
 
 	    JButton rectangleButton = new JButton("Rectangle");
 	    rectangleButton.addActionListener(new ActionListener(){
@@ -48,6 +50,8 @@ class GUI extends JFrame {
 	    		canvas1.setShape(shape.RECTANGLE);
 	    	}
 	    });
+	    rectangleButton.setFocusable(false);
+
 
 	    JButton lineButton = new JButton("Line");
 	    lineButton.addActionListener(new ActionListener() {
@@ -55,6 +59,8 @@ class GUI extends JFrame {
 	    		canvas1.setShape(shape.LINE);
 	    	}
 	    });
+	    lineButton.setFocusable(false);
+
     
 	    JButton circleButton = new JButton("Circle");
 	    circleButton.addActionListener(new ActionListener() {
@@ -62,6 +68,8 @@ class GUI extends JFrame {
 	    		canvas1.setShape(shape.CIRCLE);
 	    	}
 	    });
+	    circleButton.setFocusable(false);
+
 	    
 	    JButton drawButton = new JButton("Draw");
 	    drawButton.addActionListener(new ActionListener() {
@@ -76,9 +84,11 @@ class GUI extends JFrame {
 	            if(e.getClickCount()==2){
 	            	JFrame parent = new JFrame();
 		    	    JOptionPane sliderPane = new JOptionPane();
+		    	    
 		    	    JSlider slider = SliderMaker.getSlider(sliderPane, canvas1.getPenThickness());
 		    	    sliderPane.setMessage(new Object[] { "", slider });
 		    	    sliderPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+		    	    
 		    	    JDialog dialog = sliderPane.createDialog(parent, "Pen Thickness");
 		    	    dialog.setVisible(true);
 		    	    
@@ -90,6 +100,8 @@ class GUI extends JFrame {
 	            }
 	        }
 	    });
+	    drawButton.setFocusable(false);
+
 	    
 	 
 	    JButton clearButton = new JButton("Eraser");
@@ -122,6 +134,8 @@ class GUI extends JFrame {
 	            }
 	        }
 	    });
+	    clearButton.setFocusable(false);
+
 	    
 	    JButton colorButton = new JButton("Color");
 	    colorButton.addActionListener(new ActionListener() {
@@ -131,24 +145,28 @@ class GUI extends JFrame {
 	    		canvas1.setPenColor(color); 
 	    	}
 	    });
-	    
+	    colorButton.setFocusable(false);
+
 	    JButton textButton = new JButton("Text");
 	    textButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
+	    		canvas1.setShape(shape.TEXT);
 	    	}
 	    });
+	    textButton.setFocusable(false);
 	    
 	    //file buttons
 	    JButton saveButton = new JButton("Save");
 	    textButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
-
+	   
 	    	}
 	    });
 	    
 	    JButton saveasButton = new JButton("Save As");
 	    textButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
+	    		
 
 	    	}
 	    });

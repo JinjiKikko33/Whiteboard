@@ -3,8 +3,11 @@
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -15,7 +18,7 @@ import java.util.HashSet;
 import javax.swing.JPanel;
 
 
-class shape extends JPanel implements MouseListener, MouseMotionListener {
+class shape extends JPanel implements MouseListener, MouseMotionListener, KeyListener {
 
 	private int shape = DRAW;
 	private int startX = 0; 
@@ -24,8 +27,8 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 	private int endY = 0;
 	private BufferedImage bufImage = null;
 	private int WIDTH = 1000;
-	private int HEIGHT = 600;		
-	
+	private int HEIGHT = 600;
+		
 	private ArrayList<point> eraser = new ArrayList<>();
 	private HashSet<point> stop_eraser = new HashSet<>();
 	private ArrayList<ArrayList<point>> undermouse = new ArrayList<>();
@@ -35,6 +38,11 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 	//private ArrayList<Color> color_his = new ArrayList<>();
 	private int eraserThickness = 3;
 	private int penThickness = 3; 
+	private StringBuffer text = new StringBuffer();
+	private boolean textMode = false;
+	private boolean textDisplay = false;
+	
+	private static Font sanSerifFont = new Font("SanSerif", Font.PLAIN, 22);
 	
 	public static final int DRAW = 0;
 	public static final int LINE = 1;
@@ -42,6 +50,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 	public static final int OVAL = 3;
 	public static final int CIRCLE = 4;
 	public static final int CLEAR = 5;
+	public static final int TEXT = 6;
 	
 	
 
@@ -50,6 +59,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 		setBackground(bg); 
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
+		this.addKeyListener(this);
 	}
 
 	public void setShape(int shape) {
@@ -71,6 +81,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 			this.penThickness = thickness;
 		}
 	}
+	
 	
 	public int getEraserThickness() {
 		return this.eraserThickness;
@@ -95,9 +106,11 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 
 		g2.drawImage(bufImage, null, 0, 0); 
 		drawShape(g2);
+		
 	}
 
 	private void drawShape(Graphics2D g2) {
+
 		switch (shape) {
 		case DRAW:
 			
@@ -124,7 +137,6 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 					g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 				}
 			}
-		
 
 			break;
 		case LINE:
@@ -155,8 +167,12 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 				g2.setStroke(new BasicStroke(this.eraserThickness));
 				g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 			}
+		case TEXT:
+				System.out.println(this.text);
+				g2.setFont(this.sanSerifFont);
+				g2.setColor(this.pen);
+				g2.drawString(this.text.toString(), startX, startY);
 			
-
 			break;
 		default:
 			break;
@@ -164,44 +180,73 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 	}
 
 	public void mousePressed(MouseEvent e) {
-		startX = e.getX(); 
-		startY = e.getY(); 
-		endX = startX;
-		endY = startY;
-		undermouse = new ArrayList<>();
-		ArrayList<point> last = new ArrayList<>();
-		undermouse.add(last);
-		last.add(new point(e.getX(), e.getY()));
-		//color_his.add(pen);		
+		
+		if (shape == 6) {
+			Graphics2D grafarea = bufImage.createGraphics();			
+			drawShape(grafarea);
+			//grafarea.drawImage(bufImage, null, 0, 0);
+
+			this.text = new StringBuffer();	
+			//this.repaint();			
+
+			startX = e.getX(); 
+			startY = e.getY(); 
+		}
+		else {
+			startX = e.getX(); 
+			startY = e.getY(); 
+			endX = startX;
+			endY = startY;
+			undermouse = new ArrayList<>();
+			ArrayList<point> last = new ArrayList<>();
+			undermouse.add(last);
+			last.add(new point(e.getX(), e.getY()));
+			//color_his.add(pen);	
+		}
+		
 	}
+	
+	
 
 	public void mouseDragged(MouseEvent e) {
-		if (shape==0) {
-				ArrayList<point> last = undermouse.get(undermouse.size()-1);
-				last.add(new point(e.getX(), e.getY()));
-			
-		} if (shape==5) {
-			eraser.add(new point(e.getX(), e.getY()));			
-		}else {
-			endX = e.getX(); 
-			endY = e.getY();
+		
+		if (shape != 6) {
+			if (shape==0) {
+					ArrayList<point> last = undermouse.get(undermouse.size()-1);
+					last.add(new point(e.getX(), e.getY()));
+				
+			} if (shape==5) {
+				eraser.add(new point(e.getX(), e.getY()));			
+			}else {
+				endX = e.getX(); 
+				endY = e.getY();
+			}
+			this.repaint();
 		}
-		this.repaint();
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		Graphics2D grafarea = bufImage.createGraphics();
-		drawShape(grafarea);
-		if(shape==5) {
-			stop_eraser.add(new point(e.getX(),e.getY()));
-			eraser = new ArrayList<>();
-		}else {
-			endX = e.getX(); 
-			endY = e.getY();
-		}
-		this.repaint();
+			if (shape != 6) {
+				Graphics2D grafarea = bufImage.createGraphics();
+				drawShape(grafarea);
+				if(shape==5) {
+					stop_eraser.add(new point(e.getX(),e.getY()));
+					eraser = new ArrayList<>();
+				}else {
+					endX = e.getX(); 
+					endY = e.getY();
+				}
+				this.repaint();
+			}
+		
+		
 	}
 
+	public void addNotify() {
+		super.addNotify();
+		requestFocusInWindow();
+	}
+	
 	public void mouseMoved(MouseEvent arg0) {
 	}
 
@@ -212,6 +257,30 @@ class shape extends JPanel implements MouseListener, MouseMotionListener {
 	}
 
 	public void mouseExited(MouseEvent arg0) {
+	}
+
+	@Override
+	public void keyTyped(KeyEvent e) {
+		if (shape == 6) {
+			this.text.append(e.getKeyChar());
+			//Graphics2D grafarea = bufImage.createGraphics();			
+			//drawShape(grafarea);
+			this.repaint(); // need this
+
+		}
+		
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }
