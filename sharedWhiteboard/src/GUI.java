@@ -13,6 +13,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
@@ -25,6 +26,9 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.CardLayout;
+import java.awt.Font;
+import java.awt.Button;
 
 class GUI extends JFrame { 
 
@@ -162,6 +166,8 @@ class GUI extends JFrame {
 	   
 	    	}
 	    });
+	    saveButton.setFocusable(false);
+
 	    
 	    JButton saveasButton = new JButton("Save As");
 	    textButton.addActionListener(new ActionListener() {
@@ -170,6 +176,8 @@ class GUI extends JFrame {
 
 	    	}
 	    });
+	    saveasButton.setFocusable(false);
+
 	    
 	    JButton newButton = new JButton("New");
 	    textButton.addActionListener(new ActionListener() {
@@ -177,6 +185,8 @@ class GUI extends JFrame {
 
 	    	}
 	    });
+	    newButton.setFocusable(false);
+
 	    
 	    JButton closeButton = new JButton("Close");
 	    textButton.addActionListener(new ActionListener() {
@@ -184,6 +194,8 @@ class GUI extends JFrame {
 
 	    	}
 	    });
+	    closeButton.setFocusable(false);
+
 	    
 	    JButton connectToButton = new JButton("Connect");
 	    connectToButton.addActionListener(new ActionListener() {
@@ -191,6 +203,8 @@ class GUI extends JFrame {
 
 	    	}
 	    });
+	    connectToButton.setFocusable(false);
+
 	    
 	    
 	    
@@ -236,6 +250,18 @@ class GUI extends JFrame {
 	    user_title.setText("Current Players");
 	    userPanel.add(user_title);
 	    
+	    // Panel and items for dialog
+	    JTextField hostField = new JTextField(15);
+	    JTextField usernameField = new JTextField(8);
+
+	    JPanel myPanel = new JPanel();
+	    myPanel.add(new JLabel("Host:"));
+	    myPanel.add(hostField);
+	    myPanel.add(Box.createHorizontalStrut(15)); // a spacer
+	    myPanel.add(new JLabel("Username:"));
+	    myPanel.add(usernameField);
+	    
+	    
 	    
 	    //overall layout
 	    JPanel main = new JPanel();
@@ -243,22 +269,70 @@ class GUI extends JFrame {
 	    
 	    
 	    
-	    
 	    main.add(canvas1, BorderLayout.CENTER);
 	    main.add(buttonPanel, BorderLayout.SOUTH);
 	    main.add(filePanel, BorderLayout.NORTH);
 	    
+	    JPanel serverWhiteBoardInterface = new JPanel();
+	    		
+	    		
 	    Container content = this.getContentPane();
-	    content.setLayout(new FlowLayout());
+	    getContentPane().setLayout(new CardLayout(0, 0));
+	    
+	    JPanel entryPanel = new JPanel();
+	    entryPanel.setLayout(null);
+
+	    getContentPane().add(entryPanel, "ENTRYPANEL");
+	    
+	  
+	    
+	    JLabel lblWelcomeToThe = new JLabel("Welcome to the Shared Whiteboard");
+	    lblWelcomeToThe.setBounds(445, 26, 462, 33);
+	    lblWelcomeToThe.setFont(new Font("Lucida Grande", Font.PLAIN, 27));
+	    entryPanel.add(lblWelcomeToThe);
+	    
+	    JButton connectButton = new JButton("Connect to a Whiteboard");
+	    connectButton.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		
+	    	    int result = JOptionPane.showConfirmDialog(null, myPanel,
+	    	            "Enter your host and username", JOptionPane.OK_CANCEL_OPTION);
+	    	        if (result == JOptionPane.OK_OPTION) {
+	    	          System.out.println("x value: " + usernameField.getText());
+	    	          System.out.println("y value: " + hostField.getText());
+	    	        }
+	    		
+	    		
+	    	}
+	    });
+	    connectButton.setFocusable(false);
+
+	    connectButton.setBounds(596, 223, 208, 76);
+	    entryPanel.add(connectButton);
+	    
+	    JButton hostButton = new JButton("Host a Whiteboard");
+	    hostButton.addActionListener(new ActionListener() {
+	    	public void actionPerformed(ActionEvent e) {
+	    		CardLayout cl = (CardLayout)(getContentPane().getLayout());
+	    		cl.show(content, "SERVERPANEL");
+	    	}
+	    });
+	    hostButton.setFocusable(false);
+
+	    hostButton.setBounds(596, 311, 208, 76);
+	    entryPanel.add(hostButton);
 	    
 	    
-	    content.add(main);
-	    content.add(sidePanel);
+	    serverWhiteBoardInterface.add(main);
+	    serverWhiteBoardInterface.add(sidePanel);
+	    content.add(serverWhiteBoardInterface, "SERVERPANEL");
+	    
+	    //content.add(main, "MAINPANEL");
+	    //content.add(sidePanel, "SIDEPANEL");
 	    
 
 	
 	    this.pack();
     }
-
 }
 

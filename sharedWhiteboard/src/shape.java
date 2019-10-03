@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -40,8 +39,8 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 	private int eraserThickness = 3;
 	private int penThickness = 3; 
 	private StringBuffer text = new StringBuffer();
-	private boolean textMode = false;
-	private boolean textDisplay = false;
+	//private boolean textDisplay = false;
+	//private boolean start = true;
 	
 	private static Font sanSerifFont = new Font("SanSerif", Font.PLAIN, 22);
 	
@@ -60,7 +59,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 		setBackground(bg); 
 		this.addMouseListener(this);
 		this.addMouseMotionListener(this);
-		this.addKeyListener(this);
+		this.addKeyListener(this);		
 	}
 
 	public void setShape(int shape) {
@@ -159,7 +158,6 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 			g2.drawArc(startX, startY, endX - startX, (startY + endX - startX) - startY, 0, 360);
 			break;
 		case CLEAR:					
-			
 			for (int i=1; i<eraser.size(); i++) {
 				point point1 = eraser.get(i-1);
 				point point2 = eraser.get(i);
@@ -170,16 +168,11 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 				g2.setStroke(new BasicStroke(this.eraserThickness));
 				g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 			}
+			break;
 		case TEXT:
-
-				if (this.text.length() != 0 && this.textDisplay) { 
-					g2.setFont(this.sanSerifFont);
-					g2.setColor(this.pen);
-					System.out.println(this.text + " " + this.text.length());
-					System.out.println("X: "  + startX + "Y: " + startY + "\n");
-					g2.drawString(this.text.toString(), startX, startY);
-				}
-			
+			g2.setFont(this.sanSerifFont);
+			g2.setColor(this.pen);
+			g2.drawString(this.text.toString(), startX, startY);			
 			break;
 		default:
 			break;
@@ -189,9 +182,9 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 	public void mousePressed(MouseEvent e) {
 		
 		if (shape == 6) {
+			this.requestFocus();
 			startX = e.getX(); 
 			startY = e.getY(); 
-			
 			this.text = new StringBuffer();	
 			
 		}
@@ -245,10 +238,10 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 		
 	}
 
-	public void addNotify() {
+	/*public void addNotify() {
 		super.addNotify();
 		requestFocusInWindow();
-	}
+	}*/
 	
 	public void mouseMoved(MouseEvent arg0) {
 	}
@@ -266,13 +259,12 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 	public void keyTyped(KeyEvent e) {
 		if (shape == 6) {
 			this.text.append(e.getKeyChar());
-			this.textDisplay = true;
 			
 			Graphics2D grafarea = bufImage.createGraphics();			
 			drawShape(grafarea);
 			
-			this.textDisplay = false;
 			this.repaint();// need this
+
 
 		}
 		
@@ -289,6 +281,8 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 		// TODO Auto-generated method stub
 		
 	}
+
+
 
 }
 
