@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -94,6 +95,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 	public void paint(Graphics g)
 
 	{
+		
 		Graphics2D g2 = (Graphics2D) g; 
 		if (bufImage == null) {
 			int width = this.getWidth();
@@ -102,8 +104,9 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 			Graphics2D gc = bufImage.createGraphics();
 			gc.setColor(bg);
 			gc.fillRect(0, 0, width, height); 
-		}
 
+
+		}
 		g2.drawImage(bufImage, null, 0, 0); 
 		drawShape(g2);
 		
@@ -168,10 +171,14 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 				g2.drawLine(point1.getX(), point1.getY(), point2.getX(), point2.getY());
 			}
 		case TEXT:
-				System.out.println(this.text);
-				g2.setFont(this.sanSerifFont);
-				g2.setColor(this.pen);
-				g2.drawString(this.text.toString(), startX, startY);
+
+				if (this.text.length() != 0 && this.textDisplay) { 
+					g2.setFont(this.sanSerifFont);
+					g2.setColor(this.pen);
+					System.out.println(this.text + " " + this.text.length());
+					System.out.println("X: "  + startX + "Y: " + startY + "\n");
+					g2.drawString(this.text.toString(), startX, startY);
+				}
 			
 			break;
 		default:
@@ -182,15 +189,11 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 	public void mousePressed(MouseEvent e) {
 		
 		if (shape == 6) {
-			Graphics2D grafarea = bufImage.createGraphics();			
-			drawShape(grafarea);
-			//grafarea.drawImage(bufImage, null, 0, 0);
-
-			this.text = new StringBuffer();	
-			//this.repaint();			
-
 			startX = e.getX(); 
 			startY = e.getY(); 
+			
+			this.text = new StringBuffer();	
+			
 		}
 		else {
 			startX = e.getX(); 
@@ -263,9 +266,13 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 	public void keyTyped(KeyEvent e) {
 		if (shape == 6) {
 			this.text.append(e.getKeyChar());
-			//Graphics2D grafarea = bufImage.createGraphics();			
-			//drawShape(grafarea);
-			this.repaint(); // need this
+			this.textDisplay = true;
+			
+			Graphics2D grafarea = bufImage.createGraphics();			
+			drawShape(grafarea);
+			
+			this.textDisplay = false;
+			this.repaint();// need this
 
 		}
 		
