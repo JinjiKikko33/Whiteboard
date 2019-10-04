@@ -161,7 +161,7 @@ class GUI extends JFrame {
 	    
 	    //file buttons
 	    JButton saveButton = new JButton("Save");
-	    textButton.addActionListener(new ActionListener() {
+	    saveButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
 	   
 	    	}
@@ -170,7 +170,7 @@ class GUI extends JFrame {
 
 	    
 	    JButton saveasButton = new JButton("Save As");
-	    textButton.addActionListener(new ActionListener() {
+	    saveasButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
 	    		
 
@@ -180,16 +180,16 @@ class GUI extends JFrame {
 
 	    
 	    JButton newButton = new JButton("New");
-	    textButton.addActionListener(new ActionListener() {
+	    newButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
-
+	    		canvas1.refresh();
 	    	}
 	    });
 	    newButton.setFocusable(false);
 
 	    
 	    JButton closeButton = new JButton("Close");
-	    textButton.addActionListener(new ActionListener() {
+	    closeButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
 
 	    	}
@@ -298,6 +298,9 @@ class GUI extends JFrame {
 	    	    int result = JOptionPane.showConfirmDialog(null, myPanel,
 	    	            "Enter your host and username", JOptionPane.OK_CANCEL_OPTION);
 	    	        if (result == JOptionPane.OK_OPTION) {
+	    	        	// TODO: ATTEMPT CONNECTION TO HOST, THEN OPEN CLIENT-SIDE INTERFACE
+	    	        	
+	    	        	
 	    	          System.out.println("x value: " + usernameField.getText());
 	    	          System.out.println("y value: " + hostField.getText());
 	    	        }

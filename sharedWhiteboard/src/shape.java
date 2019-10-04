@@ -39,6 +39,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 	private int eraserThickness = 3;
 	private int penThickness = 3; 
 	private StringBuffer text = new StringBuffer();
+	private boolean refresh = false;
 	//private boolean textDisplay = false;
 	//private boolean start = true;
 	
@@ -91,6 +92,12 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 		return this.penThickness;
 	}
 	
+	public void refresh() {
+		this.refresh = true;
+		bufImage = null;
+		this.repaint();
+	}
+	
 	public void paint(Graphics g)
 
 	{
@@ -107,8 +114,12 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 
 		}
 		g2.drawImage(bufImage, null, 0, 0); 
-		drawShape(g2);
 		
+		if (!this.refresh) {
+			drawShape(g2);
+		}
+		this.refresh = false;
+
 	}
 
 	private void drawShape(Graphics2D g2) {
@@ -173,7 +184,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 			g2.setFont(this.sanSerifFont);
 			g2.setColor(this.pen);
 			g2.drawString(this.text.toString(), startX, startY);			
-			break;
+			break;			
 		default:
 			break;
 		}
@@ -225,7 +236,8 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 			if (shape != 6) {
 				Graphics2D grafarea = bufImage.createGraphics();
 				drawShape(grafarea);
-				if(shape==5) {
+				
+				if(shape ==5) {
 					stop_eraser.add(new point(e.getX(),e.getY()));
 					eraser = new ArrayList<>();
 				}else {
