@@ -1,4 +1,4 @@
-package sharedWhiteboard;
+
 
 import java.io.Serializable;
 
