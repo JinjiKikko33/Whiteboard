@@ -26,6 +26,8 @@ import java.awt.Font;
 
 class GUI extends JFrame {
 
+	private File openedFile = null;
+
 	shape canvas1 = new shape();
 
 	public GUI() {
@@ -147,6 +149,7 @@ class GUI extends JFrame {
 		JButton newButton = new JButton("New");
 		newButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				openedFile = null;
 				canvas1.refresh();
 			}
 		});
@@ -170,8 +173,11 @@ class GUI extends JFrame {
 						int cnt = chooser.showDialog(null, "open");
 						if (cnt == 0) {
 							File file = chooser.getSelectedFile();
-							canvas1.setFile(file);
-							canvas1.open();
+							if (file != null) {
+								openedFile = file;
+								canvas1.setFile(file);
+								canvas1.open();
+							}
 						}
 					}
 				}
@@ -181,8 +187,11 @@ class GUI extends JFrame {
 					int cnt = chooser.showDialog(null, "open");
 					if (cnt == 0) {
 						File file = chooser.getSelectedFile();
-						canvas1.setFile(file);
-						canvas1.open();
+						if (file != null) {
+							openedFile = file;
+							canvas1.setFile(file);
+							canvas1.open();
+						}
 					}
 				}
 
@@ -194,15 +203,21 @@ class GUI extends JFrame {
 		saveButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 
-				JFileChooser chooser = new JFileChooser();
-				int cnt = chooser.showDialog(null, "save");
-				if (cnt == 0) {
-					File file = chooser.getSelectedFile();
-					canvas1.setFile(file);
+				if (openedFile != null) {
+					canvas1.setFile(openedFile);
 					canvas1.save();
-					JOptionPane.showMessageDialog(null, "Saved successfully!");
+				} else {
+					JFileChooser chooser = new JFileChooser();
+					int cnt = chooser.showDialog(null, "save");
+					if (cnt == 0) {
+						File file = chooser.getSelectedFile();
+						if (file != null) {
+							canvas1.setFile(file);
+							canvas1.save();
+						}
+						JOptionPane.showMessageDialog(null, "Saved successfully!");
+					}
 				}
-
 			}
 		});
 		saveButton.setFocusable(false);
@@ -215,11 +230,12 @@ class GUI extends JFrame {
 				int cnt = chooser.showDialog(null, "save");
 				if (cnt == 0) {
 					File file = chooser.getSelectedFile();
-					canvas1.setFile(file);
-					canvas1.save();
+					if (file != null) {
+						canvas1.setFile(file);
+						canvas1.save();
+					}
 					JOptionPane.showMessageDialog(null, "Saved successfully!");
 				}
-
 			}
 		});
 		saveasButton.setFocusable(false);
