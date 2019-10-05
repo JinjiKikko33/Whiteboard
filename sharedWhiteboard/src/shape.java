@@ -286,6 +286,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 
 	public void open() {
 		try {
+			this.refresh();
 			bufImage = (BufferedImage) ImageIO.read(attachedFile);
 			this.repaint();
 		} catch (IOException e) {
