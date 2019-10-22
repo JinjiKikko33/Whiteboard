@@ -336,9 +336,13 @@ class GUI extends JFrame {
 	    userPanel.add(user_title);
 
 	    // Panel and items for dialog
+	    JTextField serverHostField = new JTextField(15);
+	    JTextField serverUsernameField = new JTextField(8);
+	    JTextField serverPortField = new JTextField(5);
+	    
 	    JTextField hostField = new JTextField(15);
 	    JTextField usernameField = new JTextField(8);
-	    JTextField clientPortField = new JTextField(5);
+	    JTextField portField = new JTextField(5);
 
 	    JPanel clientConnectionPanel = new JPanel();
 	    clientConnectionPanel.add(new JLabel("Host:"));
@@ -348,7 +352,15 @@ class GUI extends JFrame {
 	    clientConnectionPanel.add(usernameField);
 	    clientConnectionPanel.add(Box.createVerticalStrut(15)); // a spacer
 	    clientConnectionPanel.add(new JLabel("Port:"));
-	    clientConnectionPanel.add(clientPortField);
+	    clientConnectionPanel.add(portField);
+	    
+	    JPanel serverConnectionPanel = new JPanel();
+	    serverConnectionPanel.add(Box.createHorizontalStrut(15)); // a spacer
+	    serverConnectionPanel.add(new JLabel("Username:"));
+	    serverConnectionPanel.add(serverUsernameField);
+	    serverConnectionPanel.add(Box.createVerticalStrut(15)); // a spacer
+	    serverConnectionPanel.add(new JLabel("Port:"));
+	    serverConnectionPanel.add(serverPortField);
 
 	    	    //overall layout
 	    JPanel main = new JPanel();
@@ -386,19 +398,17 @@ class GUI extends JFrame {
 
 	    	          System.out.println("username: " + usernameField.getText());
 	    	          System.out.println("host: " + hostField.getText());
-	    	          System.out.println("port: " + clientPortField.getText());
+	    	          System.out.println("port: " + portField.getText());
 
-                  String host = hostField.getText();
-    	        	  String usernmae = usernameField.getText();
 	    	        if (result == JOptionPane.OK_OPTION) {
 
 	    	          try {
 	    	        	  String host = hostField.getText();
-	    	        	  int port = Integer.parseInt(clientPortField.getText());
+	    	        	  int port = Integer.parseInt(portField.getText());
 	    	        	  Socket conn = new Socket(host, port);
 	    	        	  DataInputStream din = new DataInputStream(conn.getInputStream());
 	    	        	  DataOutputStream dout = new DataOutputStream(conn.getOutputStream());
-	    	        	  // add output stream to canvas1
+
 	    	        	  canvas1.addOutputStream(dout);
 
 	    	        	  ClientRunnable clir;
@@ -433,12 +443,13 @@ class GUI extends JFrame {
 	    	public void actionPerformed(ActionEvent e) {
 	    	    int result = JOptionPane.showConfirmDialog(null, serverConnectionPanel,
 	    	            "Enter your username and port number", JOptionPane.OK_CANCEL_OPTION);
+	    	   
 	    	    if (result == JOptionPane.OK_OPTION) {
 	    	    	//select port number
-					System.out.println("username: " + usernameField.getText());
-					System.out.println("port: " + clientPortField.getText());
-					String username = usernameField.getText();
-					int port = Integer.parseInt(clientPortField.getText());
+					System.out.println("username: " + serverUsernameField.getText());
+					System.out.println("port: " + serverPortField.getText());
+					String username = serverUsernameField.getText();
+					int port = Integer.parseInt(serverPortField.getText());
 					Server s = new Server(canvas1, port);
 					new Thread(s).start();
 

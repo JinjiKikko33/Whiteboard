@@ -85,7 +85,7 @@ public class ClientRunnable implements Runnable {
 
 			Message m = Message.makeMessageFromJson(request);
 			//check whether server refuse connection
-			if (!m.getConnection()) {
+			if (m.isConnectionDenied()) {
 				System.out.println(m.getDeniedMessage());
 				break;
 			}

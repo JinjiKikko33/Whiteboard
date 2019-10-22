@@ -86,7 +86,7 @@ public class ServerRunnable implements Runnable {
 					String desiredName = m.getUsername();
 
 
-					for (String s : ActiveConnections.SocketUsernameMap.values()) {
+					for (String s : ActiveConnections.SocketUsernameMap.keySet()) {
 						if (s.equals(desiredName)){
 							reply.setConnectionDenied(true);
 							reply.setDeniedMessage("username taken");
@@ -102,7 +102,7 @@ public class ServerRunnable implements Runnable {
 						}
 					}
 					// username free
-					ActiveConnections.SocketUsernameMap.put(conn, desiredName);
+					ActiveConnections.SocketUsernameMap.put(desiredName, conn);
 					reply.setConnectionDenied(false);
 
 					// get bufImage and send
