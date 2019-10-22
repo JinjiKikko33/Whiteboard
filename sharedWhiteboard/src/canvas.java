@@ -14,5 +14,4 @@ class canvas implements Serializable {
 	}
 }
   
-  
 
