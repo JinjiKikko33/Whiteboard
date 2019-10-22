@@ -416,6 +416,7 @@ class GUI extends JFrame {
 	    	        	  try {
 	    	        		clir = new ClientRunnable(conn, canvas1, usernameField.getText());
 	    	        	  } catch (IllegalArgumentException ilex) {
+	    	        		  System.err.println("Error: Taken");
 	    	        		  conn.close();
 	    	        		  JOptionPane.showMessageDialog(null, "Error: Username already taken");
 	    	        		  return;
