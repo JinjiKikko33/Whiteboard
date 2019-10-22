@@ -32,9 +32,6 @@ public class Server implements Runnable{
 			//TODO: Accept or deny new user here and check username
 			
 			
-			System.out.println("New socket opened to " + conn.getInetAddress() + " on port "
-					+ port);
-			
 			} catch (IOException e) {
 				System.out.println("ERROR: Cannot establish a connection");
 				continue;

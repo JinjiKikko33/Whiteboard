@@ -5,14 +5,17 @@ public class UserConnection extends Socket {
 	
 	String username;
 	
-	public UserConnection(String host, int port, String username) throws IOException {
+	public UserConnection(String host, int port) throws IOException {
 		super(host, port);
-		this.username = username;
 		
 	}
 	
 	public String getUsername() {
 		return this.username;
+	}
+	
+	public void setUsername(String username) {
+		this.username = username;
 	}
 
 }

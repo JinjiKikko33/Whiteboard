@@ -403,7 +403,17 @@ class GUI extends JFrame {
 	    	        	  // add output stream to canvas1
 	    	        	  canvas1.addOutputStream(dout);
 	    	        	  
-	    	        	  ClientRunnable clir = new ClientRunnable(conn, canvas1);
+	    	        	  ClientRunnable clir;
+	    	        	  // handle exception here (no contact with server or username taken
+	    	        	  try {
+	    	        		clir = new ClientRunnable(conn, canvas1, usernameField.getText());
+	    	        	  } catch (IllegalArgumentException ilex) {		  
+	    	        		  JOptionPane.showMessageDialog(null, "Error: Username already taken");
+	    	        		  return;
+	    	        	  }
+	    	        	  
+	    	        	  
+	    	        	  
 	    	        	  new Thread(clir).start();
 	    	          } catch (IOException ex) {
 	    	        	  System.err.println("Error: Could not connect to server. Check the host and port number");

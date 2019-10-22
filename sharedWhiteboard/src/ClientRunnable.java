@@ -12,17 +12,11 @@ import java.nio.charset.StandardCharsets;
 public class ClientRunnable implements Runnable {
 	Socket conn;
 	shape canvas1;
-	private final Charset UTF8_CHARSET = Charset.forName("UTF-8");
-
+	DataInputStream din;
 	
-	public ClientRunnable(Socket conn, shape canvas1) {
+	public ClientRunnable(Socket conn, shape canvas1, String username) {
 		this.conn = conn;
 		this.canvas1 = canvas1;
-	}
-	
-	@Override
-	public void run() {
-		DataInputStream din = null;
 		try {
 			din = new DataInputStream(conn.getInputStream());
 		} catch (IOException e1) {
@@ -33,7 +27,46 @@ public class ClientRunnable implements Runnable {
 			System.err.println("ERROR: Could not establish connection with server");
 			System.exit(1);
 		}
+		if (!freeUsername(username)) {
+			throw new IllegalArgumentException();
+		}
 		
+		
+	}
+	
+	private boolean freeUsername(String username) {
+		Message m = new Message();
+		m.setRequestType(10);
+		m.setUsername(username);
+		Message in = new Message();
+		
+		try {
+			DataOutputStream dout = new DataOutputStream(conn.getOutputStream());
+			dout.writeUTF(Message.toJson(m));
+		} catch (IOException e) {
+			return false;
+		}
+		
+		try {
+			in = Message.makeMessageFromJson(din.readUTF());
+		} catch (IOException e) {
+			return false;
+		}
+		
+		if (in.isConnectionDenied() && in.getDeniedMessage().equals("username taken")){
+			System.out.println("username taken!!");
+			return false;
+		} else {
+			return true;
+		}
+		
+	
+	}
+
+
+	@Override
+	public void run() {
+
 		
 		while (true) {
 			String request = null;
@@ -60,6 +93,14 @@ public class ClientRunnable implements Runnable {
 		}
 		
 		
+	}
+	private void closeAllConnections() {
+		try {
+			din.close();
+			conn.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

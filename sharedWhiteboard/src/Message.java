@@ -22,6 +22,7 @@ public class Message {
 // Chat 7
 // Clear canvas 8
 // Open image 9
+// checkusername 10
 
 
 	private int requestType;
@@ -33,6 +34,9 @@ public class Message {
 	private String img;
 	private int imgHeight;
 	private int imgWidth;
+	
+	private boolean connectionDenied; 
+	private String deniedMessage;
 
 	// x and y coordinate of point
 	private int[][] pointsXY;
@@ -198,6 +202,22 @@ public class Message {
 		xy[0] = pointX;
 		xy[1] = pointY;
 		this.pointsXY = xy;
+	}
+
+	public String getDeniedMessage() {
+		return deniedMessage;
+	}
+
+	public void setDeniedMessage(String deniedMessage) {
+		this.deniedMessage = deniedMessage;
+	}
+
+	public boolean isConnectionDenied() {
+		return connectionDenied;
+	}
+
+	public void setConnectionDenied(boolean connectionDenied) {
+		this.connectionDenied = connectionDenied;
 	}
 
 
