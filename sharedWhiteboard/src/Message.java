@@ -23,6 +23,8 @@ public class Message {
 // Clear canvas 8
 // Open image 9
 
+// checkusername 10
+
 
 	private int requestType;
 	private int penThickness;
@@ -34,20 +36,19 @@ public class Message {
 	private int imgHeight;
 	private int imgWidth;
 
+
+	private boolean connectionDenied;
+	private String deniedMessage;
+
 	// x and y coordinate of point
 	private int[][] pointsXY;
-	
+
 	// color components
 	// can obtain with Color.getRGB()
 	// convert from int to Color with constructor
 	// Color c = new Color(colorInt, false)
 	private int color;
-	
-	//set to False if server refuse connection; set to True otherwise
-	private boolean connection;
-	//message when server refuse connection
-	private String refuseMsg;
-	
+
 	// no constructors since we'd need to make lots of them depending
 	// on the instruction
 	// instead, we just set the relevant variables
@@ -72,7 +73,7 @@ public class Message {
 
 	public static void main(String[] args) {
 		byte[] b = {6,5,4,3};
-		
+
 		Message m = new Message();
 		m.setRequestType(0);
 		m.setPenThickness(30);
@@ -100,7 +101,7 @@ public class Message {
 	public int getHeight() {
 		return this.imgHeight;
 	}
-	
+
 	public int getWidth() {
 		return this.imgWidth;
 	}
@@ -166,7 +167,7 @@ public class Message {
 		this.messageText = messageText;
 	}
 
-	
+
 	public void setStartAndEndXY(int startX, int startY, int endX, int endY) {
 		this.startX = startX;
 		this.startY = startY;
@@ -203,23 +204,22 @@ public class Message {
 		xy[1] = pointY;
 		this.pointsXY = xy;
 	}
-	
-	//set and retrieve connection status
-	public boolean getConnection() {
-		return connection;
+
+
+	public String getDeniedMessage() {
+		return deniedMessage;
 	}
 
-	public void setConnection(boolean status) {
-		connection = status;
+	public void setDeniedMessage(String deniedMessage) {
+		this.deniedMessage = deniedMessage;
 	}
-	
-	//get and set refuse message for socket connection
-	public String getRefuseMsg() {
-		return refuseMsg;
+
+	public boolean isConnectionDenied() {
+		return connectionDenied;
 	}
-	
-	public void setRefuseMsg(String msg) {
-		refuseMsg = msg;
+
+	public void setConnectionDenied(boolean connectionDenied) {
+		this.connectionDenied = connectionDenied;
 	}
-	
+
 }
