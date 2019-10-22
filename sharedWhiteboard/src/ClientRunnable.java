@@ -28,6 +28,7 @@ public class ClientRunnable implements Runnable {
 			System.exit(1);
 		}
 		if (!freeUsername(username)) {
+			
 			throw new IllegalArgumentException();
 		}
 		
@@ -57,6 +58,7 @@ public class ClientRunnable implements Runnable {
 			System.out.println("username taken!!");
 			return false;
 		} else {
+			canvas1.drawServerShape(in);
 			return true;
 		}
 		

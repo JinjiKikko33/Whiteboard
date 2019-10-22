@@ -1,4 +1,5 @@
 import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -74,16 +75,10 @@ public class ServerRunnable implements Runnable {
 						String strReply = Message.toJson(reply);
 						try { 
 							dout.writeUTF(strReply);
-							System.out.println(strReply);
+							conn.close();
+							ActiveConnections.endPoints.remove(conn);
 							return;
 						} catch (IOException e) {
-							ActiveConnections.endPoints.remove(conn);
-							try {
-								conn.close();
-							} catch (IOException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
 							e.printStackTrace();
 						}
 					}
@@ -91,6 +86,12 @@ public class ServerRunnable implements Runnable {
 				// username free
 				ActiveConnections.SocketUsernameMap.put(conn, desiredName);
 				reply.setConnectionDenied(false);
+				
+				// get bufImage and send
+				BufferedImage img = canvas1.getBufImage();
+				reply.setImg(canvas1.encodeString(img));
+				reply.setRequestType(shape.OPEN);
+				
 				String strReply = Message.toJson(reply);	
 				try { 
 					dout.writeUTF(strReply);
@@ -123,12 +124,7 @@ public class ServerRunnable implements Runnable {
 					
 					
 				}
-			}
-			
-			
-			
-			
-			
+			}			
 			
 		}
 		

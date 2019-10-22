@@ -144,8 +144,17 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 	}
 	
 	public void drawServerShape(Message m) {
+		if (bufImage == null) {
+			int width = this.getWidth();
+			int height = this.getHeight();
+			bufImage = (BufferedImage) this.createImage(width, height);
+			Graphics2D gc = bufImage.createGraphics();
+			gc.setColor(bg);
+			gc.fillRect(0, 0, width, height); 
 
-		Graphics2D g2 = bufImage.createGraphics();		
+		}
+		
+		Graphics2D g2 = bufImage.createGraphics();
 		int type = m.getRequestType();
 		//System.out.println("FROM CLIENT: " + m);
 		switch (type) {
@@ -412,11 +421,13 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 			this.repaint();
 			sendMessage();
 			
+		} else {
+			undermouse = new ArrayList<>();
 		}
 
 				
 
-		}
+	}
 	
 		
 	}
@@ -448,7 +459,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 					e2.printStackTrace();
 				}
 				try {	
-					System.out.println(json);
+					//System.out.println(json);
 					dout.writeUTF(json);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
@@ -568,7 +579,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 	}
 
 
-	private String encodeString(BufferedImage img) {
+	public String encodeString(BufferedImage img) {
 		String imgString = null;
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		
@@ -584,7 +595,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 			
 	}
 	
-	private BufferedImage decodeString(String buffer) {
+	public BufferedImage decodeString(String buffer) {
 		BufferedImage image = null;
 		byte[] imgByte;
 		try {
@@ -597,6 +608,10 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 		} catch (IOException e) {
 			return null;
 		}
+	}
+	
+	public BufferedImage getBufImage() {
+		return this.bufImage;
 	}
 	
 	

@@ -10,6 +10,13 @@ public class ActiveConnections {
 	
 	public static ConcurrentHashMap<Socket, String> SocketUsernameMap = new ConcurrentHashMap<>();
 	
+	
+	/*
+	 * obtain all usernames with ActiveConnections.SocketUsernameMap.values
+	 * map socket to usernames like any other hashmap
+	 * ActiveConnections.SocketUsernameMap.put(<Socket>, username);
+	 * ActiveConnections.SocketUsernameMap.contains(<Socket>);
+	 * */
 
 
 }

@@ -407,7 +407,8 @@ class GUI extends JFrame {
 	    	        	  // handle exception here (no contact with server or username taken
 	    	        	  try {
 	    	        		clir = new ClientRunnable(conn, canvas1, usernameField.getText());
-	    	        	  } catch (IllegalArgumentException ilex) {		  
+	    	        	  } catch (IllegalArgumentException ilex) {
+	    	        		  conn.close();
 	    	        		  JOptionPane.showMessageDialog(null, "Error: Username already taken");
 	    	        		  return;
 	    	        	  }
