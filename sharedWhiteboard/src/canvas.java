@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import javax.swing.JFrame;
 
-class canvas implements Serializable {
+public class canvas implements Serializable {
 
 	public static void main(String[] args) {
 		GUI window = new GUI();
