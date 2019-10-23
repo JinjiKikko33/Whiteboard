@@ -1,3 +1,5 @@
+import java.awt.CardLayout;
+import java.awt.Container;
 import java.awt.Graphics2D;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -6,6 +8,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.AccessDeniedException;
 
 // We listen for updates from the host owner in a separate thread
 
@@ -14,14 +17,19 @@ public class ClientRunnable implements Runnable {
 	shape canvas1;
 	PlayerList userPanel;
 
-
+	CardLayout cl;
+	Container container; 
 
 	DataInputStream din;
 
-	public ClientRunnable(Socket conn, shape canvas1, String username, PlayerList userPanel) {
+	public ClientRunnable(Socket conn, shape canvas1, String username, PlayerList userPanel,
+			Container c, CardLayout cl) {
 		this.conn = conn;
 		this.canvas1 = canvas1;
 		this.userPanel = userPanel;
+		this.container = c;
+		this.cl = cl;
+		
 
 
 		try {
@@ -100,7 +108,9 @@ public class ClientRunnable implements Runnable {
 				System.out.println(denyMsg);
 				conn.close();
 				userPanel.denyPopup(denyMsg); //pop up window before closing the program
-				System.exit(1);
+				
+    	        CardLayout cl = (CardLayout)(container.getLayout());
+    	        cl.show(container, "ENTRYPANEL");				
 				break;
 				}
 				catch (IOException e) {

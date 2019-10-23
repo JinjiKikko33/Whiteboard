@@ -37,6 +37,7 @@ import java.awt.CardLayout;
 import java.awt.Font;
 import java.awt.Button;
 
+
 class GUI extends JFrame {
 
 
@@ -46,6 +47,9 @@ class GUI extends JFrame {
 	Server server;
 	private JPanel entryPanel; 
 	boolean lostConnection = false;
+	Container container;
+	
+
 
 
 
@@ -54,6 +58,7 @@ class GUI extends JFrame {
     	
     	
 	    Container content = this.getContentPane();
+	    this.container = content;
 	    getContentPane().setLayout(new CardLayout(0, 0));
 	    
 	    
@@ -439,7 +444,7 @@ class GUI extends JFrame {
 	    	        	  ClientRunnable clir;
 	    	        	  // handle exception here (no contact with server or username taken
 	    	        	  try {
-	    	        		clir = new ClientRunnable(conn, canvas1, usernameField.getText(), userPanel);
+	    	        		clir = new ClientRunnable(conn, canvas1, usernameField.getText(), userPanel, container, cl);
 	    	        		
 	    	        	  } catch (IllegalArgumentException ilex) {
 	    	        		  //System.err.println("Error: Taken");
@@ -503,6 +508,7 @@ class GUI extends JFrame {
 
 	    hostButton.setBounds(596, 311, 208, 76);
 	    entryPanel.add(hostButton);
+	    this.entryPanel = entryPanel;
 
 
 	    serverWhiteBoardInterface.add(main);
