@@ -16,12 +16,16 @@ public class ServerRunnable implements Runnable {
 	shape canvas1;
 	PlayerList userPanel;
 	String username;
+	String managerUsername;
 
-	public ServerRunnable(Socket conn, shape canvas, PlayerList userPanel) {
+	public ServerRunnable(Socket conn, shape canvas, PlayerList userPanel, String managerUsername) {
 		this.canvas1 = canvas;
 		this.conn = conn;
 		this.userPanel = userPanel;
+		this.managerUsername = managerUsername;
 	}
+
+
 
 	@Override
 	public void run() {
@@ -44,7 +48,10 @@ public class ServerRunnable implements Runnable {
 		}
 
 		while (true) {
-
+				if (conn.isClosed()) {
+					return;
+				}
+			
 				String request = null;
 				try {
 					request = din.readUTF();
@@ -70,29 +77,26 @@ public class ServerRunnable implements Runnable {
 
 				// check username
 				if (m.getRequestType() == 10) {
-					Message reply = new Message();
 					String desiredName = m.getUsername();
 
 
+					if (desiredName.equals(managerUsername)) {
+						sendTakenUsernameMessage(dout);
+						return;
+					}
+					
 					for (String s : ActiveConnections.SocketUsernameMap.keySet()) {
-						if (s.equals(desiredName)){
-							reply.setConnectionDenied(true);
-							reply.setDeniedMessage("username taken");
-							String strReply = Message.toJson(reply);
-							try {
-								dout.writeUTF(strReply);
-								conn.close();
-								ActiveConnections.endPoints.remove(conn);
-								return;
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+
+						if (s.equals(desiredName))	{	
+							sendTakenUsernameMessage(dout);
+							return;
 						}
 					}
 					
 					//manager refuse connection
 					boolean isAccept = userPanel.acceptPopup(desiredName);
 					if (!isAccept) {
+						Message reply = new Message();
 						reply.setConnectionDenied(true);
 						reply.setDeniedMessage("refuse connection");
 						String strReply = Message.toJson(reply);
@@ -107,6 +111,7 @@ public class ServerRunnable implements Runnable {
 					}
 					
 					// username free
+					Message reply = new Message();
 					ActiveConnections.SocketUsernameMap.put(desiredName, conn);
 					reply.setConnectionDenied(false);
 					
@@ -178,4 +183,18 @@ public class ServerRunnable implements Runnable {
 				}
 		}
 	}
+	private void sendTakenUsernameMessage(DataOutputStream dout) {
+		Message reply = new Message();
+		reply.setConnectionDenied(true);
+		reply.setDeniedMessage("username taken");
+		String strReply = Message.toJson(reply);
+		try {
+			dout.writeUTF(strReply);
+			conn.close();
+			ActiveConnections.endPoints.remove(conn);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 }
