@@ -10,6 +10,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 
+import javax.swing.JOptionPane;
+
 // We listen for updates from the host owner in a separate thread
 
 public class ClientRunnable implements Runnable {
@@ -39,8 +41,8 @@ public class ClientRunnable implements Runnable {
 			e1.printStackTrace();
 
 			//TODO: Implement server error
-			System.err.println("ERROR: Could not establish connection with server");
-			System.exit(1);
+			handleServerDisconnect();
+
 		}
 		if (!freeUsername(username)) {
 			throw new IllegalArgumentException();
@@ -92,11 +94,10 @@ public class ClientRunnable implements Runnable {
 			String request = null;
 			try {
 				request = din.readUTF();
-				System.out.println(request);
 			} catch (IOException e) {
 				System.err.println("ERROR: Could not get request from server");
-				e.printStackTrace();
-				System.exit(1);
+				//e.printStackTrace();
+				handleServerDisconnect();
 			}
 
 
@@ -108,13 +109,13 @@ public class ClientRunnable implements Runnable {
 				System.out.println(denyMsg);
 				conn.close();
 				userPanel.denyPopup(denyMsg); //pop up window before closing the program
-				
+				canvas1.refresh();
     	        CardLayout cl = (CardLayout)(container.getLayout());
     	        cl.show(container, "ENTRYPANEL");				
 				break;
 				}
 				catch (IOException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
 
@@ -125,6 +126,14 @@ public class ClientRunnable implements Runnable {
 		}
 	}
 
+	private void handleServerDisconnect() {
+		JOptionPane.showMessageDialog(null, "Error: Could not make contact with the server");
+		closeAllConnections();
+		canvas1.refresh();
+		CardLayout cl = (CardLayout)(container.getLayout());
+		cl.show(container, "ENTRYPANEL");
+	}
+	
 	private void closeAllConnections() {
 		try {
 			din.close();

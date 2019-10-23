@@ -42,7 +42,7 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 	private int HEIGHT = 600;
 	private File attachedFile = null;
 
-	private boolean clientMode = false;
+	boolean clientMode = false;
 	private DataOutputStream clientOutputStream;
 
 	private ArrayList<point> eraser = new ArrayList<>();
