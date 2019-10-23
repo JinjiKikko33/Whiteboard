@@ -10,6 +10,8 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.AccessDeniedException;
 
+import javax.swing.JOptionPane;
+
 // We listen for updates from the host owner in a separate thread
 
 public class ClientRunnable implements Runnable {
@@ -33,8 +35,8 @@ public class ClientRunnable implements Runnable {
 		try {
 			din = new DataInputStream(conn.getInputStream());
 		} catch (IOException e1) {
-			System.err.println("ERROR: Could not establish connection with server");
-			System.exit(1);
+			//TODO: Implement server error
+			handleServerDisconnect();
 		}
 		
 		if (!freeUsername(username)) {
@@ -87,11 +89,11 @@ public class ClientRunnable implements Runnable {
 			String request = null;
 			try {
 				request = din.readUTF();
-				System.out.println(request);
 			} catch (IOException e) {
-				e.printStackTrace();
 				System.err.println("ERROR: Could not get request from server");
-				System.exit(1);
+				//e.printStackTrace();
+				handleServerDisconnect();
+
 			}
 
 
@@ -103,12 +105,13 @@ public class ClientRunnable implements Runnable {
 				System.out.println(denyMsg);
 				conn.close();
 				userPanel.denyPopup(denyMsg); //pop up window before closing the program
-    	        CardLayout cl = (CardLayout)(container.getLayout());
-    	        cl.show(container, "ENTRYPANEL");				
+				canvas1.refresh();
+        CardLayout cl = (CardLayout)(container.getLayout());
+        cl.show(container, "ENTRYPANEL");				
 				break;
 				}
 				catch (IOException e) {
-					e.printStackTrace();
+					//e.printStackTrace();
 				}
 			}
 
@@ -119,6 +122,14 @@ public class ClientRunnable implements Runnable {
 		}
 	}
 
+	private void handleServerDisconnect() {
+		JOptionPane.showMessageDialog(null, "Error: Could not make contact with the server");
+		closeAllConnections();
+		canvas1.refresh();
+		CardLayout cl = (CardLayout)(container.getLayout());
+		cl.show(container, "ENTRYPANEL");
+	}
+	
 	private void closeAllConnections() {
 		try {
 			din.close();

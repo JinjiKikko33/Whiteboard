@@ -499,6 +499,8 @@ class GUI extends JFrame {
 
 					// TODO: handle port number in use exception
 
+					filePanel.setVisible(true);
+	 	    	    userPanel.setVisible(true);
 		    		cl.show(content, "SERVERPANEL");
 	    	    }
 	    	}

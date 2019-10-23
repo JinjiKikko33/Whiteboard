@@ -13,6 +13,8 @@ public class Server implements Runnable{
 
 	public Server(shape c, int port, PlayerList userPanel, String username) {
 		this.canvas1 = c;
+		canvas1.clientMode = false;
+		
 		this.port = port;
 		this.userPanel = userPanel;
 		this.active = true;
