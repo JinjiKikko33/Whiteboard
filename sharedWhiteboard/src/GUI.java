@@ -444,7 +444,7 @@ class GUI extends JFrame {
 	    	        	  ClientRunnable clir;
 	    	        	  // handle exception here (no contact with server or username taken
 	    	        	  try {
-	    	        		clir = new ClientRunnable(conn, canvas1, usernameField.getText(), userPanel, container, cl);
+	    	        		clir = new ClientRunnable(conn, canvas1, usernameField.getText(), userPanel, container);
 	    	        		
 	    	        	  } catch (IllegalArgumentException ilex) {
 	    	        		  //System.err.println("Error: Taken");

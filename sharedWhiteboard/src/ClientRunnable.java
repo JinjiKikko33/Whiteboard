@@ -17,31 +17,26 @@ public class ClientRunnable implements Runnable {
 	shape canvas1;
 	PlayerList userPanel;
 
-	CardLayout cl;
 	Container container; 
 
 	DataInputStream din;
 
 	public ClientRunnable(Socket conn, shape canvas1, String username, PlayerList userPanel,
-			Container c, CardLayout cl) {
+			Container c) {
 		this.conn = conn;
 		this.canvas1 = canvas1;
 		this.userPanel = userPanel;
 		this.container = c;
-		this.cl = cl;
 		
 
 
 		try {
 			din = new DataInputStream(conn.getInputStream());
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-
-			//TODO: Implement server error
 			System.err.println("ERROR: Could not establish connection with server");
 			System.exit(1);
 		}
+		
 		if (!freeUsername(username)) {
 			throw new IllegalArgumentException();
 		}
@@ -94,8 +89,8 @@ public class ClientRunnable implements Runnable {
 				request = din.readUTF();
 				System.out.println(request);
 			} catch (IOException e) {
-				System.err.println("ERROR: Could not get request from server");
 				e.printStackTrace();
+				System.err.println("ERROR: Could not get request from server");
 				System.exit(1);
 			}
 
@@ -108,7 +103,6 @@ public class ClientRunnable implements Runnable {
 				System.out.println(denyMsg);
 				conn.close();
 				userPanel.denyPopup(denyMsg); //pop up window before closing the program
-				
     	        CardLayout cl = (CardLayout)(container.getLayout());
     	        cl.show(container, "ENTRYPANEL");				
 				break;
