@@ -427,7 +427,7 @@ class GUI extends JFrame {
 	    	          }
 	    	        CardLayout cl = (CardLayout)(getContentPane().getLayout());
  	    	        filePanel.setVisible(false);
- 	    	        //userPanel.submit.setVisible(false);
+ 	    	        userPanel.setVisible(false);
 	  	    		cl.show(content, "SERVERPANEL");
 
 	    	        }

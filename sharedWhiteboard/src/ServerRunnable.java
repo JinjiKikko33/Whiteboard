@@ -51,7 +51,7 @@ public class ServerRunnable implements Runnable {
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					System.err.println("ERROR: Lost connection with client");
-					e.printStackTrace();
+					//e.printStackTrace();
 					try {
 						ActiveConnections.endPoints.remove(conn);
 						if (ActiveConnections.SocketUsernameMap.containsKey(username)) {
@@ -66,6 +66,7 @@ public class ServerRunnable implements Runnable {
 				} 
 
 				Message m = Message.makeMessageFromJson(request);
+			
 
 				// check username
 				if (m.getRequestType() == 10) {
@@ -159,6 +160,8 @@ public class ServerRunnable implements Runnable {
 				// draw locally
 				canvas1.drawServerShape(m);
 				
+				
+				//convert m to json string
 				// pass instruction to all non-originating clients
 				InetAddress addr = conn.getInetAddress();
 				for (Socket activeConnection : ActiveConnections.endPoints) {

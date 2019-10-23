@@ -12,6 +12,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.swing.JButton;
@@ -71,8 +72,8 @@ public class PlayerList extends JPanel{
 		submit.addActionListener(new ActionListener(){
 	    	public void actionPerformed(ActionEvent e){
 	    		if(index>=0) {
-	    			//removedUser = model.elementAt(index);
-	    			model.removeElementAt(index);
+	    			removedUser = model.elementAt(index);
+	    			model.removeElement(removedUser);
 	    			isKickOut = true;
 	    		}
 	    	}
@@ -81,29 +82,34 @@ public class PlayerList extends JPanel{
 	    
 	}
 	
+	//server side add users
 	public void updatePlayerList(String username) {
 		model.addElement(username);
 	}
 	
+	//server side delete users
 	public void deletePlayer(String username) {
 		if (model.contains(username)) {
 			model.removeElement(username);
 		}
 	}
 	
+	//client side GUI effects
+	//pop up window for different error messages when client get denied during connection
 	public void denyPopup(String s) {
 		if(s.equals("kick out")) {
 			JOptionPane.showMessageDialog(null,
 			    "You are beinng kicked out by the whiteboard manager");
 		}else if(s.equals("refuse connection")) {
 			JOptionPane.showMessageDialog(null,
-				    "Your connection request was rejected by manager");
+				 "Your connection request was rejected by manager");
 		}else if(s.equals("username taken")) {
 			JOptionPane.showMessageDialog(null,
-				    "Username has been taken. Please change a new one");
+				 "Username has been taken. Please change a new one");
 		}
 	}
 	
+	//pop up window for accepting new clients
 	public boolean acceptPopup(String s) {
 		int result = JOptionPane.showConfirmDialog(
 			    null,

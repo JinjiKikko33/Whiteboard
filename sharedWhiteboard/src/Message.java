@@ -39,6 +39,7 @@ public class Message {
 
 	private boolean connectionDenied;
 	private String deniedMessage;
+	
 
 	// x and y coordinate of point
 	private int[][] pointsXY;

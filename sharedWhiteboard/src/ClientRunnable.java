@@ -70,6 +70,7 @@ public class ClientRunnable implements Runnable {
 			return false;
 		} else {
 			canvas1.drawServerShape(in);
+			
 			return true;
 		}
 
@@ -110,10 +111,8 @@ public class ClientRunnable implements Runnable {
 			// draw locally
 			//System.out.println("REQ:" + m.getRequestType());
 			canvas1.drawServerShape(m);
-			
+
 		}
-
-
 	}
 
 	private void closeAllConnections() {
