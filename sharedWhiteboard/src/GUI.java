@@ -15,6 +15,8 @@ import java.io.DataOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -41,11 +43,21 @@ class GUI extends JFrame {
     shape canvas1 = new shape();
     PlayerList userPanel = new PlayerList();
 	private File openedFile = null;
+	Server server;
+	private JPanel entryPanel; 
+	boolean lostConnection = false;
 
 
 
     public GUI() {
     	//drawing buttons
+    	
+    	
+	    Container content = this.getContentPane();
+	    getContentPane().setLayout(new CardLayout(0, 0));
+	    
+	    
+	    
 	    JButton ovalButton = new JButton("Oval");
 	    ovalButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
@@ -275,6 +287,22 @@ class GUI extends JFrame {
 	    JButton closeButton = new JButton("Close");
 	    closeButton.addActionListener(new ActionListener() {
 	    	public void actionPerformed(ActionEvent e){
+	    		// close all connections
+	    		for (Socket s : ActiveConnections.endPoints) {
+	    			try {
+	    				s.close();
+	    			} catch (IOException e1) {
+	    				continue;
+	    			}	
+	    		}
+	    		canvas1.refresh();
+	    		server.setActive(false); // no longer listen to new connections
+	    		server.close();
+    	        CardLayout cl = (CardLayout)(getContentPane().getLayout());
+    	        cl.show(content, "ENTRYPANEL");
+	    		
+	    		
+	    	
 
 	    	}
 	    });
@@ -370,8 +398,7 @@ class GUI extends JFrame {
 
 	    JPanel serverWhiteBoardInterface = new JPanel();
 
-	    Container content = this.getContentPane();
-	    getContentPane().setLayout(new CardLayout(0, 0));
+
 
 	    JPanel entryPanel = new JPanel();
 	    entryPanel.setLayout(null);
@@ -397,6 +424,7 @@ class GUI extends JFrame {
 	    	          System.out.println("port: " + portField.getText());
 
 	    	        if (result == JOptionPane.OK_OPTION) {
+		    	       CardLayout cl = (CardLayout)(getContentPane().getLayout());
 
 	    	          try {
 	    	        	  String host = hostField.getText();
@@ -421,11 +449,13 @@ class GUI extends JFrame {
 	    	        	  }
 
 	    	        	  new Thread(clir).start();
-	    	          } catch (IOException ex) {
-	    	        	  System.err.println("Error: Could not connect to server. Check the host and port number");
+	    	          } catch (IOException | IllegalArgumentException ex) {  
+	    	        	  JOptionPane.showMessageDialog(null, "Error: Could not connect to server. Check the host and port number");
+	    	        	  cl.show(content, "ENTRYPANEL");
+	    	        	  return;
 
 	    	          }
-	    	        CardLayout cl = (CardLayout)(getContentPane().getLayout());
+	    	          	    	          
  	    	        filePanel.setVisible(false);
  	    	        //userPanel.submit.setVisible(false);
 	  	    		cl.show(content, "SERVERPANEL");
@@ -445,17 +475,25 @@ class GUI extends JFrame {
 	    	            "Enter your username and port number", JOptionPane.OK_CANCEL_OPTION);
 	    	   
 	    	    if (result == JOptionPane.OK_OPTION) {
+		    	    CardLayout cl = (CardLayout)(getContentPane().getLayout());
+	    	    	Server s = null;
 	    	    	//select port number
-					System.out.println("username: " + serverUsernameField.getText());
-					System.out.println("port: " + serverPortField.getText());
-					String username = serverUsernameField.getText();
-					int port = Integer.parseInt(serverPortField.getText());
-					Server s = new Server(canvas1, port, userPanel);
-					new Thread(s).start();
+		    	    try {
+						String username = serverUsernameField.getText();
+						int port = Integer.parseInt(serverPortField.getText());
+						s = new Server(canvas1, port, userPanel, username);
+						server = s;
+						server.startServer();
+
+		    	    } catch (IllegalArgumentException | IOException e1) {
+		    	    	JOptionPane.showMessageDialog(null, "Error: Invalid port number");
+		    	    	cl.show(content, "ENTRYPANEL");
+		    	    	return;
+		    	    }
+					new Thread(server).start();
 
 					// TODO: handle port number in use exception
 
-		    		CardLayout cl = (CardLayout)(getContentPane().getLayout());
 		    		cl.show(content, "SERVERPANEL");
 	    	    }
 	    	}
@@ -476,4 +514,5 @@ class GUI extends JFrame {
 
 	    this.pack();
     }
+    
 }

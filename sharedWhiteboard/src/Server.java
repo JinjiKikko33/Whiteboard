@@ -7,27 +7,43 @@ public class Server implements Runnable{
 	shape canvas1;
 	PlayerList userPanel;
 	int port;
+	boolean active;
+	ServerSocket server;
+	String username;
 
-	public Server(shape c, int port, PlayerList userPanel) {
+	public Server(shape c, int port, PlayerList userPanel, String username) {
 		this.canvas1 = c;
 		this.port = port;
 		this.userPanel = userPanel;
+		this.active = true;
+		this.username = username;
+		
 	}
+	
+	public void setActive(boolean status) {
+		this.active = status;
+	}
+	
+	
+	public void close() {
+		try {
+			this.server.close();
+		} catch (IOException e) {}
+	}
+	
+	public void startServer() throws IOException{
+		ServerSocket server = null;
+		server = new ServerSocket(port);
+		this.server = server;
+		System.out.println("Running server on port: " + port);
+	}
+	
 
 	@Override
 	// Start the server
 	public void run() {
-		ServerSocket server = null;
-		try {
-			server = new ServerSocket(port);
-			System.out.println("Running server on port: " + port);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			System.err.println("ERROR: Could not start server");
-			e.printStackTrace();
-		}
 
-		while (true) {
+		while (active) {
 			Socket conn;
 			try {
 			conn = server.accept();
@@ -48,7 +64,7 @@ public class Server implements Runnable{
 			ActiveConnections.endPoints.add(conn);
 			
 			//TODO: Implement ConnectionRunnable to accept requests and draw on canvas
-			new Thread(new ServerRunnable(conn, canvas1, userPanel)).start();
+			new Thread(new ServerRunnable(conn, canvas1, userPanel, username)).start();
 
 
 		}
