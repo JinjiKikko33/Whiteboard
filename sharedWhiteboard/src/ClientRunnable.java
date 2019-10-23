@@ -12,13 +12,17 @@ import java.nio.charset.StandardCharsets;
 public class ClientRunnable implements Runnable {
 	Socket conn;
 	shape canvas1;
+	PlayerList userPanel;
+
 
 
 	DataInputStream din;
 
-	public ClientRunnable(Socket conn, shape canvas1, String username) {
+	public ClientRunnable(Socket conn, shape canvas1, String username, PlayerList userPanel) {
 		this.conn = conn;
 		this.canvas1 = canvas1;
+		this.userPanel = userPanel;
+
 
 		try {
 			din = new DataInputStream(conn.getInputStream());
@@ -58,6 +62,11 @@ public class ClientRunnable implements Runnable {
 
 		if (in.isConnectionDenied() && in.getDeniedMessage().equals("username taken")){
 			System.out.println("username taken!!");
+			userPanel.denyPopup(in.getDeniedMessage());
+			return false;
+		} else if(in.isConnectionDenied() && in.getDeniedMessage().equals("refuse connection")) {
+			System.out.println("refuse connection!!");
+			userPanel.denyPopup(in.getDeniedMessage());
 			return false;
 		} else {
 			canvas1.drawServerShape(in);
@@ -70,12 +79,11 @@ public class ClientRunnable implements Runnable {
 
 	@Override
 	public void run() {
-
-
 		while (true) {
 			String request = null;
 			try {
 				request = din.readUTF();
+				System.out.println(request);
 			} catch (IOException e) {
 				System.err.println("ERROR: Could not get request from server");
 				e.printStackTrace();
@@ -86,13 +94,23 @@ public class ClientRunnable implements Runnable {
 			Message m = Message.makeMessageFromJson(request);
 			//check whether server refuse connection
 			if (m.isConnectionDenied()) {
-				System.out.println(m.getDeniedMessage());
+				try {
+				String denyMsg = m.getDeniedMessage();
+				System.out.println(denyMsg);
+				conn.close();
+				userPanel.denyPopup(denyMsg); //pop up window before closing the program
+				System.exit(1);
 				break;
+				}
+				catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
 
 			// draw locally
 			//System.out.println("REQ:" + m.getRequestType());
 			canvas1.drawServerShape(m);
+			
 		}
 
 

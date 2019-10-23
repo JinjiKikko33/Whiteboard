@@ -5,11 +5,13 @@ import java.io.*;
 public class Server implements Runnable{
 
 	shape canvas1;
+	PlayerList userPanel;
 	int port;
 
-	public Server(shape c, int port) {
+	public Server(shape c, int port, PlayerList userPanel) {
 		this.canvas1 = c;
 		this.port = port;
+		this.userPanel = userPanel;
 	}
 
 	@Override
@@ -44,9 +46,9 @@ public class Server implements Runnable{
 			// Add the connection to the list of active connections
 			// TODO: Delete if connection lost
 			ActiveConnections.endPoints.add(conn);
-
+			
 			//TODO: Implement ConnectionRunnable to accept requests and draw on canvas
-			new Thread(new ServerRunnable(conn, canvas1)).start();
+			new Thread(new ServerRunnable(conn, canvas1, userPanel)).start();
 
 
 		}

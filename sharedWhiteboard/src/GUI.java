@@ -39,6 +39,7 @@ class GUI extends JFrame {
 
 
     shape canvas1 = new shape();
+    PlayerList userPanel = new PlayerList();
 	private File openedFile = null;
 
 
@@ -316,13 +317,12 @@ class GUI extends JFrame {
 
 	    //chatbox and user list layout
 	    JPanel chatPanel = new JPanel();
-	    JPanel userPanel = new JPanel();
 	    JPanel sidePanel = new JPanel();
 	    sidePanel.setPreferredSize(new Dimension(300,650));
 	    chatPanel.setPreferredSize(new Dimension(300,650));
 	    userPanel.setPreferredSize(new Dimension(300,200));
 	    chatPanel.setBackground(Color.white);
-	    userPanel.setBackground(Color.white);
+	    //userPanel.setBackground(Color.white);
 	    sidePanel.setLayout(new FlowLayout());
 	    sidePanel.add(userPanel);
 	    sidePanel.add(chatPanel);
@@ -330,10 +330,6 @@ class GUI extends JFrame {
 	    JLabel chat_title = new JLabel();
 	    chat_title.setText("Chat Box");
 	    chatPanel.add(chat_title);
-
-	    JLabel user_title = new JLabel();
-	    user_title.setText("Current Players");
-	    userPanel.add(user_title);
 
 	    // Panel and items for dialog
 	    JTextField serverHostField = new JTextField(15);
@@ -406,6 +402,7 @@ class GUI extends JFrame {
 	    	        	  String host = hostField.getText();
 	    	        	  int port = Integer.parseInt(portField.getText());
 	    	        	  Socket conn = new Socket(host, port);
+	    	        	  //why do we need this for
 	    	        	  DataInputStream din = new DataInputStream(conn.getInputStream());
 	    	        	  DataOutputStream dout = new DataOutputStream(conn.getOutputStream());
 
@@ -414,11 +411,12 @@ class GUI extends JFrame {
 	    	        	  ClientRunnable clir;
 	    	        	  // handle exception here (no contact with server or username taken
 	    	        	  try {
-	    	        		clir = new ClientRunnable(conn, canvas1, usernameField.getText());
+	    	        		clir = new ClientRunnable(conn, canvas1, usernameField.getText(), userPanel);
+	    	        		
 	    	        	  } catch (IllegalArgumentException ilex) {
-	    	        		  System.err.println("Error: Taken");
+	    	        		  //System.err.println("Error: Taken");
 	    	        		  conn.close();
-	    	        		  JOptionPane.showMessageDialog(null, "Error: Username already taken");
+	    	        		  //JOptionPane.showMessageDialog(null, "Error: Username already taken");
 	    	        		  return;
 	    	        	  }
 
@@ -429,7 +427,8 @@ class GUI extends JFrame {
 	    	          }
 	    	        CardLayout cl = (CardLayout)(getContentPane().getLayout());
  	    	        filePanel.setVisible(false);
-	  	    		  cl.show(content, "SERVERPANEL");
+ 	    	        //userPanel.submit.setVisible(false);
+	  	    		cl.show(content, "SERVERPANEL");
 
 	    	        }
 	    	     }
@@ -451,7 +450,7 @@ class GUI extends JFrame {
 					System.out.println("port: " + serverPortField.getText());
 					String username = serverUsernameField.getText();
 					int port = Integer.parseInt(serverPortField.getText());
-					Server s = new Server(canvas1, port);
+					Server s = new Server(canvas1, port, userPanel);
 					new Thread(s).start();
 
 					// TODO: handle port number in use exception

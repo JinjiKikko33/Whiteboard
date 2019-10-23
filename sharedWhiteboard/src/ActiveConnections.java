@@ -12,10 +12,7 @@ public class ActiveConnections {
 
 
 	/*
-	 * obtain all usernames with ActiveConnections.SocketUsernameMap.values
-	 * map socket to usernames like any other hashmap
-	 * ActiveConnections.SocketUsernameMap.put(<Socket>, username);
-	 * ActiveConnections.SocketUsernameMap.contains(<Socket>);
+	 * ActiveConnections.SocketUsernameMap.keySet <-- for loop through this
 	 * */
 
 
