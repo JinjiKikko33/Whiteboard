@@ -12,9 +12,4 @@ public class ActiveConnections {
 	public static ConcurrentHashMap<String, Socket> SocketUsernameMap = new ConcurrentHashMap<>();
 
 
-	/*
-	 * ActiveConnections.SocketUsernameMap.keySet <-- for loop through this
-	 * */
-
-
 }

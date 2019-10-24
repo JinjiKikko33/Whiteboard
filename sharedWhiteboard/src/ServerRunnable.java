@@ -41,11 +41,9 @@ public class ServerRunnable implements Runnable {
 
 		} catch (IOException e) {
 			System.err.println("ERROR: Could not initialize streams. Removing user");
-
 			ActiveConnections.endPoints.remove(conn);
 			ActiveConnections.SocketUsernameMap.remove(conn);
 
-			// remove from chat list?
 			return;
 		}
 
@@ -58,9 +56,8 @@ public class ServerRunnable implements Runnable {
 			try {
 				request = din.readUTF();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				System.err.println("ERROR: Lost connection with client");
-				// e.printStackTrace();
+
 				try {
 					ActiveConnections.endPoints.remove(conn);
 					if (ActiveConnections.SocketUsernameMap.containsKey(username)) {
@@ -70,6 +67,7 @@ public class ServerRunnable implements Runnable {
 					conn.close();
 					return;
 				} catch (IOException e1) {
+					System.out.println("Error: cannot close socket");
 					e1.printStackTrace();
 				}
 			}
@@ -86,7 +84,6 @@ public class ServerRunnable implements Runnable {
 				}
 
 				for (String s : ActiveConnections.SocketUsernameMap.keySet()) {
-
 					if (s.equals(desiredName)) {
 						sendTakenUsernameMessage(dout);
 						return;
@@ -106,6 +103,7 @@ public class ServerRunnable implements Runnable {
 						ActiveConnections.endPoints.remove(conn);
 						return;
 					} catch (IOException e) {
+						System.out.println("Error: cannot close socket");
 						e.printStackTrace();
 					}
 				}
@@ -132,6 +130,7 @@ public class ServerRunnable implements Runnable {
 				} catch (IOException e) {
 					ActiveConnections.endPoints.remove(conn);
 					ActiveConnections.SocketUsernameMap.remove(username);
+					System.out.println("Error: Lost connection with client");
 					e.printStackTrace();
 				}
 
@@ -139,7 +138,7 @@ public class ServerRunnable implements Runnable {
 
 			}
 
-			// System.out.println("IN LOOP: " + m);
+
 
 			// check whether manager kick this client out
 			if (userPanel.isKickOut && username.equals(userPanel.removedUser)) {
@@ -147,7 +146,7 @@ public class ServerRunnable implements Runnable {
 				deny.setConnectionDenied(true);
 				deny.setDeniedMessage("kick out");
 				String strDeny = Message.toJson(deny);
-				System.out.println(strDeny);
+
 				try {
 					dout.writeUTF(strDeny);
 					conn.close();
@@ -156,6 +155,7 @@ public class ServerRunnable implements Runnable {
 					userPanel.isKickOut = false;
 					return;
 				} catch (IOException e2) {
+					System.out.println("Error: cannot close socket");
 					e2.printStackTrace();
 				}
 			}
@@ -164,7 +164,7 @@ public class ServerRunnable implements Runnable {
 
 			// read from chat message
 
-			System.out.println(m.getRequestType() + " m.requesttype");
+			//System.out.println(m.getRequestType() + " m.requesttype");
 			if (m.getRequestType() == 7) {
 				senderName = m.getUsername();
 				String msg = m.getChatMessage();
@@ -187,7 +187,7 @@ public class ServerRunnable implements Runnable {
 						DataOutputStream activeOut = new DataOutputStream(activeConnection.getOutputStream());
 						activeOut.writeUTF(request);
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
+						System.out.println("Error: Lost connection with client");
 						e.printStackTrace();
 						continue;
 					}
@@ -206,6 +206,7 @@ public class ServerRunnable implements Runnable {
 			conn.close();
 			ActiveConnections.endPoints.remove(conn);
 		} catch (IOException e) {
+			System.out.println("Error: Lost connection with client");
 			e.printStackTrace();
 		}
 	}

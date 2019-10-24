@@ -11,6 +11,7 @@ import java.net.UnknownHostException;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -29,10 +30,8 @@ public class ChatBox extends JPanel {
 	String username;
 	
 	boolean clientMode = false;
-	
-
 	private String message;
-	// boolean isSendChat = false;
+
 
 	public ChatBox() {
 
@@ -90,61 +89,67 @@ public class ChatBox extends JPanel {
 	}
 
 	public void sendChat() {
-		// System.out.println(111111);
 		message = tx.getText();
-		Message chat = new Message();
-		chat.setRequestType(7);
-		if(clientMode) {
-			chat.setUsername(username);
-		}else {
-			chat.setUsername(serverUsername);
-		}
-		chat.setChatMessage(message);
-		if(clientMode) {
-			updateChat(username + " : " + message);
-		}else {
-			updateChat(serverUsername + " : " + message);
-		}
-		String strChat = Message.toJson(chat);
-		// System.out.println(strChat);
 		
-		if(clientMode) {
-			try {
-				System.out.println(strChat);
-				dout.writeUTF(strChat);
-
-			} catch (IOException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+		if (message.trim().length() < 1) {
+			//check if message is empty or only contains space
+			JOptionPane.showMessageDialog(null,
+					 "You can't send empty message");
+		}else {
+		
+			Message chat = new Message();
+			chat.setRequestType(7);
+			if(clientMode) {
+				chat.setUsername(username);
+			}else {
+				chat.setUsername(serverUsername);
 			}
-		
-		}else {
-			for (Socket s : ActiveConnections.endPoints) {
-				DataOutputStream toClient = null;
+			chat.setChatMessage(message);
+			if(clientMode) {
+				updateChat(username + " : " + message);
+			}else {
+				updateChat(serverUsername + " : " + message);
+			}
+			String strChat = Message.toJson(chat);
+			
+			if(clientMode) {
 				try {
-					toClient = new DataOutputStream(s.getOutputStream());
-				} catch (IOException e2) {
-					// TODO Auto-generated catch block
-					e2.printStackTrace();
+					System.out.println(strChat);
+					dout.writeUTF(strChat);
+	
+				} catch (IOException e1) {
+					JOptionPane.showMessageDialog(null,
+							 "Your connection with server has lost.");
+					e1.printStackTrace();
 				}
-				try {
-					toClient.writeUTF(strChat);
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-					ActiveConnections.endPoints.remove(s);
+			
+			}else {
+				for (Socket s : ActiveConnections.endPoints) {
+					DataOutputStream toClient = null;
 					try {
-						s.close();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
+						toClient = new DataOutputStream(s.getOutputStream());
+					} catch (IOException e2) {
+						System.out.println("Error: Cannot create data output stream");
+						e2.printStackTrace();
 					}
-					continue;
+					try {
+						toClient.writeUTF(strChat);
+					} catch (IOException e) {
+						System.out.println("Error: Lost connection with client");
+						e.printStackTrace();
+						ActiveConnections.endPoints.remove(s);
+						try {
+							s.close();
+						} catch (IOException e1) {
+							System.out.println("Error: Cannot close the socket");
+							e1.printStackTrace();
+						}
+						continue;
+					}
 				}
 			}
-		}
 
-		
+		}
 
 	}
 

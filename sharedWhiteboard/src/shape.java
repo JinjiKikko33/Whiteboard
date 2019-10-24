@@ -1,6 +1,7 @@
 
 
 import java.awt.BasicStroke;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -25,6 +26,7 @@ import java.util.Base64.Encoder;
 import java.util.HashSet;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 import com.google.gson.Gson;
@@ -442,31 +444,32 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 				clientOutputStream.writeUTF(json);
 			} catch (IOException e) {
 				System.err.println("Error: Cannot connect to server. Closing program...");
+				JOptionPane.showMessageDialog(null,
+						 "Your connection with server has lost.");
 				clientMode = false;
+				
 				System.exit(1);
 			}
 		} else {
-			// really messy :(
 
 			for (Socket s : ActiveConnections.endPoints) {
 				DataOutputStream dout = null;
 				try {
 					dout = new DataOutputStream(s.getOutputStream());
 				} catch (IOException e2) {
-					// TODO Auto-generated catch block
+					System.out.println("Error: Cannot create data output stream");
 					e2.printStackTrace();
 				}
 				try {
 					dout.writeUTF(json);
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 					System.err.println("Error: Could not write update to client " + s.getInetAddress().toString() + " disconnecting...");
+					e.printStackTrace();
 					ActiveConnections.endPoints.remove(s);
 					try {
 						s.close();
 					} catch (IOException e1) {
-						// TODO Auto-generated catch block
+						System.out.println("Error: Cannot close the socket");
 						e1.printStackTrace();
 					}
 					continue;
@@ -535,7 +538,6 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 			bufImage = (BufferedImage) ImageIO.read(attachedFile);
 			success = true;
 		} catch (IOException e2) {
-			// TODO Auto-generated catch block
 			e2.printStackTrace();
 		}
 		shape = -1;
@@ -556,7 +558,6 @@ class shape extends JPanel implements MouseListener, MouseMotionListener, KeyLis
 		try {
 			ImageIO.write(bufImage, "png", attachedFile);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

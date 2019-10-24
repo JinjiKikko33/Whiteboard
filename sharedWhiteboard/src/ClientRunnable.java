@@ -79,7 +79,6 @@ public class ClientRunnable implements Runnable {
 			return false;
 		} else {
 			canvas1.drawServerShape(in);
-
 			return true;
 		}
 
@@ -93,13 +92,13 @@ public class ClientRunnable implements Runnable {
 				request = din.readUTF();
 			} catch (IOException e) {
 				System.err.println("ERROR: Could not get request from server");
-				// e.printStackTrace();
 				handleServerDisconnect();
 				return;
 
 			}
 
 			Message m = Message.makeMessageFromJson(request);
+			
 			// check whether server refuse connection
 			if (m.isConnectionDenied()) {
 				try {
@@ -112,7 +111,8 @@ public class ClientRunnable implements Runnable {
 					cl.show(container, "ENTRYPANEL");
 					break;
 				} catch (IOException e) {
-					// e.printStackTrace();
+					System.out.println("Error: Cannot close the socket");
+					e.printStackTrace();
 				}
 			}
 
@@ -127,7 +127,6 @@ public class ClientRunnable implements Runnable {
 
 
 			// draw locally
-			// System.out.println("REQ:" + m.getRequestType());
 			canvas1.drawServerShape(m);
 
 		}
@@ -146,6 +145,7 @@ public class ClientRunnable implements Runnable {
 			din.close();
 			conn.close();
 		} catch (IOException e) {
+			System.out.println("Error: Cannot close the socket");
 			e.printStackTrace();
 		}
 	}

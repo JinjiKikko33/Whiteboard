@@ -52,8 +52,6 @@ public class Server implements Runnable {
 			Socket conn;
 			try {
 				conn = server.accept();
-				// TODO: Accept or deny new user here and check username
-
 				System.out.println("New socket opened to " + conn.getInetAddress() + " on port " + port);
 
 			} catch (IOException e) {
@@ -63,10 +61,7 @@ public class Server implements Runnable {
 			}
 
 			// Add the connection to the list of active connections
-			// TODO: Delete if connection lost
 			ActiveConnections.endPoints.add(conn);
-
-			// TODO: Implement ConnectionRunnable to accept requests and draw on canvas
 			new Thread(new ServerRunnable(conn, canvas1, userPanel, username, chatWindow)).start();
 
 		}
