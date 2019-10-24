@@ -37,157 +37,142 @@ import java.awt.CardLayout;
 import java.awt.Font;
 import java.awt.Button;
 
-
 class GUI extends JFrame {
 
-
-    shape canvas1 = new shape();
-    PlayerList userPanel = new PlayerList();
+	shape canvas1 = new shape();
+	PlayerList userPanel = new PlayerList();
+	ChatBox chatboxPanel = new ChatBox();
 	private File openedFile = null;
 	Server server;
-	private JPanel entryPanel; 
+	private JPanel entryPanel;
 	boolean lostConnection = false;
 	Container container;
-	
 
+	public GUI() {
+		// drawing buttons
 
+		Container content = this.getContentPane();
+		this.container = content;
+		getContentPane().setLayout(new CardLayout(0, 0));
 
+		JButton ovalButton = new JButton("Oval");
+		ovalButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				canvas1.setShape(shape.OVAL);
+			}
+		});
+		ovalButton.setFocusable(false);
 
-    public GUI() {
-    	//drawing buttons
-    	
-    	
-	    Container content = this.getContentPane();
-	    this.container = content;
-	    getContentPane().setLayout(new CardLayout(0, 0));
-	    
-	    
-	    
-	    JButton ovalButton = new JButton("Oval");
-	    ovalButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
-	    		canvas1.setShape(shape.OVAL);
-	    	}
-	    });
-	    ovalButton.setFocusable(false);
+		JButton rectangleButton = new JButton("Rectangle");
+		rectangleButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				canvas1.setShape(shape.RECTANGLE);
+			}
+		});
+		rectangleButton.setFocusable(false);
 
+		JButton lineButton = new JButton("Line");
+		lineButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				canvas1.setShape(shape.LINE);
+			}
+		});
+		lineButton.setFocusable(false);
 
-	    JButton rectangleButton = new JButton("Rectangle");
-	    rectangleButton.addActionListener(new ActionListener(){
-	    	public void actionPerformed(ActionEvent e){
-	    		canvas1.setShape(shape.RECTANGLE);
-	    	}
-	    });
-	    rectangleButton.setFocusable(false);
+		JButton circleButton = new JButton("Circle");
+		circleButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				canvas1.setShape(shape.CIRCLE);
+			}
+		});
+		circleButton.setFocusable(false);
 
+		JButton drawButton = new JButton("Draw");
+		drawButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				canvas1.setShape(shape.DRAW);
+			}
+		});
 
-	    JButton lineButton = new JButton("Line");
-	    lineButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
-	    		canvas1.setShape(shape.LINE);
-	    	}
-	    });
-	    lineButton.setFocusable(false);
+		drawButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					JFrame parent = new JFrame();
+					JOptionPane sliderPane = new JOptionPane();
 
+					JSlider slider = SliderMaker.getSlider(sliderPane, canvas1.getPenThickness());
+					sliderPane.setMessage(new Object[] { "", slider });
+					sliderPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
 
-	    JButton circleButton = new JButton("Circle");
-	    circleButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
-	    		canvas1.setShape(shape.CIRCLE);
-	    	}
-	    });
-	    circleButton.setFocusable(false);
+					JDialog dialog = sliderPane.createDialog(parent, "Pen Thickness");
+					dialog.setVisible(true);
 
+					if (sliderPane.getInputValue().equals("uninitializedValue")) {
+						canvas1.setPenThickness(-1);
+					} else {
+						canvas1.setPenThickness((int) sliderPane.getInputValue());
+					}
+				}
+			}
+		});
+		drawButton.setFocusable(false);
 
-	    JButton drawButton = new JButton("Draw");
-	    drawButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
-	    	    canvas1.setShape(shape.DRAW);
-	    	}
-	    });
+		JButton clearButton = new JButton("Eraser");
+		clearButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				canvas1.setShape(shape.CLEAR);
+			}
+		});
 
-	    drawButton.addMouseListener(new MouseAdapter(){
-	        @Override
-	        public void mouseClicked(MouseEvent e){
-	            if(e.getClickCount()==2){
-	            	JFrame parent = new JFrame();
-		    	    JOptionPane sliderPane = new JOptionPane();
+		/*
+		 * TODO: Combine both event listeners to one (one mouseclick will be enough to
+		 * set the canvas shape to CLEAR
+		 */
+		clearButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() == 2) {
+					JFrame parent = new JFrame();
+					JOptionPane sliderPane = new JOptionPane();
+					JSlider slider = SliderMaker.getSlider(sliderPane, canvas1.getEraserThickness());
+					sliderPane.setMessage(new Object[] { "", slider });
+					sliderPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+					JDialog dialog = sliderPane.createDialog(parent, "Eraser Thickness");
+					dialog.setVisible(true);
+					if (sliderPane.getInputValue().equals("uninitializedValue")) {
+						canvas1.setEraserThickness(-1);
+					} else {
+						canvas1.setEraserThickness((int) sliderPane.getInputValue());
+					}
+				}
+			}
+		});
+		clearButton.setFocusable(false);
 
-		    	    JSlider slider = SliderMaker.getSlider(sliderPane, canvas1.getPenThickness());
-		    	    sliderPane.setMessage(new Object[] { "", slider });
-		    	    sliderPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
+		JButton colorButton = new JButton("Color");
+		colorButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Color initialcolor = Color.RED;
+				Color color = JColorChooser.showDialog(GUI.this, "Select a color", initialcolor);
+				canvas1.setPenColor(color);
+			}
+		});
+		colorButton.setFocusable(false);
 
-		    	    JDialog dialog = sliderPane.createDialog(parent, "Pen Thickness");
-		    	    dialog.setVisible(true);
+		JButton textButton = new JButton("Text");
+		textButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				canvas1.setShape(shape.TEXT);
+			}
+		});
+		textButton.setFocusable(false);
 
-		    	    if (sliderPane.getInputValue().equals("uninitializedValue")) {
-			    	    canvas1.setPenThickness(-1);
-		    	    } else {
-			    	    canvas1.setPenThickness((int) sliderPane.getInputValue());
-		    	    }
-	            }
-	        }
-	    });
-	    drawButton.setFocusable(false);
-
-
-
-	    JButton clearButton = new JButton("Eraser");
-	    clearButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
-	    		canvas1.setShape(shape.CLEAR);
-	    	}
-	    });
-
-
-	    /* TODO: Combine both event listeners to one (one mouseclick will be enough
-	    * to set the canvas shape to CLEAR
-	    */
-	    clearButton.addMouseListener(new MouseAdapter(){
-	        @Override
-	        public void mouseClicked(MouseEvent e){
-	            if(e.getClickCount()==2){
-	            	JFrame parent = new JFrame();
-		    	    JOptionPane sliderPane = new JOptionPane();
-		    	    JSlider slider = SliderMaker.getSlider(sliderPane, canvas1.getEraserThickness());
-		    	    sliderPane.setMessage(new Object[] { "", slider });
-		    	    sliderPane.setOptionType(JOptionPane.OK_CANCEL_OPTION);
-		    	    JDialog dialog = sliderPane.createDialog(parent, "Eraser Thickness");
-		    	    dialog.setVisible(true);
-		    	    if (sliderPane.getInputValue().equals("uninitializedValue")) {
-			    	    canvas1.setEraserThickness(-1);
-		    	    } else {
-			    	    canvas1.setEraserThickness((int) sliderPane.getInputValue());
-		    	    }
-	            }
-	        }
-	    });
-	    clearButton.setFocusable(false);
-
-
-	    JButton colorButton = new JButton("Color");
-	    colorButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
-	    		Color initialcolor=Color.RED;
-	    		Color color=JColorChooser.showDialog(GUI.this,"Select a color",initialcolor);
-	    		canvas1.setPenColor(color);
-	    	}
-	    });
-	    colorButton.setFocusable(false);
-
-	    JButton textButton = new JButton("Text");
-	    textButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
-	    		canvas1.setShape(shape.TEXT);
-	    	}
-	    });
-	    textButton.setFocusable(false);
-
-	    //file buttons
-	    JButton saveButton = new JButton("Save");
-	    saveButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
-	    		if (openedFile != null) {
+		// file buttons
+		JButton saveButton = new JButton("Save");
+		saveButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (openedFile != null) {
 					canvas1.setFile(openedFile);
 					canvas1.save();
 				} else {
@@ -203,10 +188,9 @@ class GUI extends JFrame {
 					}
 				}
 
-	    	}
-	    });
-	    saveButton.setFocusable(false);
-
+			}
+		});
+		saveButton.setFocusable(false);
 
 		JButton openButton = new JButton("Open");
 		openButton.addActionListener(new ActionListener() {
@@ -252,10 +236,9 @@ class GUI extends JFrame {
 		});
 		openButton.setFocusable(false);
 
-
-	    JButton saveasButton = new JButton("Save As");
-	    saveasButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
+		JButton saveasButton = new JButton("Save As");
+		saveasButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 				JFileChooser chooser = new JFileChooser();
 				int cnt = chooser.showDialog(null, "save");
 				if (cnt == 0) {
@@ -267,260 +250,248 @@ class GUI extends JFrame {
 					JOptionPane.showMessageDialog(null, "Saved successfully!");
 				}
 
-	    	}
-	    });
-	    saveasButton.setFocusable(false);
+			}
+		});
+		saveasButton.setFocusable(false);
 
-
-	    JButton newButton = new JButton("New");
-	    newButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
+		JButton newButton = new JButton("New");
+		newButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 
 				openedFile = null;
-	    		canvas1.refresh();
+				canvas1.refresh();
 
-	    		Message m = new Message();
-	    		m.setRequestType(shape.CLEARCANVAS);
+				Message m = new Message();
+				m.setRequestType(shape.CLEARCANVAS);
 
-	    		canvas1.setMessage(m);
-	    		canvas1.sendMessage();
-	    	}
-	    });
-	    newButton.setFocusable(false);
+				canvas1.setMessage(m);
+				canvas1.sendMessage();
+			}
+		});
+		newButton.setFocusable(false);
 
+		JButton closeButton = new JButton("Close");
+		closeButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				// close all connections
+				for (Socket s : ActiveConnections.endPoints) {
+					try {
+						s.close();
+					} catch (IOException e1) {
+						continue;
+					}
+				}
+				canvas1.refresh();
+				server.setActive(false); // no longer listen to new connections
+				server.close();
+				CardLayout cl = (CardLayout) (getContentPane().getLayout());
+				cl.show(content, "ENTRYPANEL");
 
-	    JButton closeButton = new JButton("Close");
-	    closeButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
-	    		// close all connections
-	    		for (Socket s : ActiveConnections.endPoints) {
-	    			try {
-	    				s.close();
-	    			} catch (IOException e1) {
-	    				continue;
-	    			}	
-	    		}
-	    		canvas1.refresh();
-	    		server.setActive(false); // no longer listen to new connections
-	    		server.close();
-    	        CardLayout cl = (CardLayout)(getContentPane().getLayout());
-    	        cl.show(content, "ENTRYPANEL");
-	    		
-	    		
-	    	
+			}
+		});
+		closeButton.setFocusable(false);
 
-	    	}
-	    });
-	    closeButton.setFocusable(false);
+		JButton connectToButton = new JButton("Connect");
+		connectToButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 
+			}
+		});
+		connectToButton.setFocusable(false);
 
-	    JButton connectToButton = new JButton("Connect");
-	    connectToButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e){
+		// main panel layout
+		JPanel buttonPanel = new JPanel();
+		buttonPanel.setLayout(new GridLayout(1, 8));
+		buttonPanel.add(ovalButton);
+		buttonPanel.add(rectangleButton);
+		buttonPanel.add(lineButton);
+		buttonPanel.add(circleButton);
+		buttonPanel.add(textButton);
+		buttonPanel.add(drawButton);
+		buttonPanel.add(clearButton);
+		buttonPanel.add(colorButton);
 
-	    	}
-	    });
-	    connectToButton.setFocusable(false);
-
-
-
-
-
-	    //main panel layout
-	    JPanel buttonPanel = new JPanel();
-	    buttonPanel.setLayout(new GridLayout(1, 8));
-	    buttonPanel.add(ovalButton);
-	    buttonPanel.add(rectangleButton);
-	    buttonPanel.add(lineButton);
-	    buttonPanel.add(circleButton);
-	    buttonPanel.add(textButton);
-	    buttonPanel.add(drawButton);
-	    buttonPanel.add(clearButton);
-	    buttonPanel.add(colorButton);
-
-	    JPanel filePanel = new JPanel();
-	    filePanel.setLayout(new GridLayout(1, 4));
-	    filePanel.add(newButton);
-	    filePanel.add(saveButton);
-	    filePanel.add(saveasButton);
-	    filePanel.add(closeButton);
+		JPanel filePanel = new JPanel();
+		filePanel.setLayout(new GridLayout(1, 4));
+		filePanel.add(newButton);
+		filePanel.add(saveButton);
+		filePanel.add(saveasButton);
+		filePanel.add(closeButton);
 		filePanel.add(openButton);
 
+		// chatbox and user list layout
 
+		JPanel sidePanel = new JPanel();
+		sidePanel.setPreferredSize(new Dimension(300, 650));
+		userPanel.setPreferredSize(new Dimension(300, 200));
 
-	    //chatbox and user list layout
-	    JPanel chatPanel = new JPanel();
-	    JPanel sidePanel = new JPanel();
-	    sidePanel.setPreferredSize(new Dimension(300,650));
-	    chatPanel.setPreferredSize(new Dimension(300,650));
-	    userPanel.setPreferredSize(new Dimension(300,200));
-	    chatPanel.setBackground(Color.white);
-	    //userPanel.setBackground(Color.white);
-	    sidePanel.setLayout(new FlowLayout());
-	    sidePanel.add(userPanel);
-	    sidePanel.add(chatPanel);
+		sidePanel.setLayout(new FlowLayout());
+		sidePanel.add(userPanel);
+		sidePanel.add(chatboxPanel);
 
-	    JLabel chat_title = new JLabel();
-	    chat_title.setText("Chat Box");
-	    chatPanel.add(chat_title);
+//	    JPanel chatPanel = new JPanel();
+//	    chatPanel.setPreferredSize(new Dimension(300,650));
+//	    JLabel chat_title = new JLabel();
+//	    chatPanel.setBackground(Color.white);
+//	    chat_title.setText("Chat Box");
+//	    chatPanel.add(chat_title);
 
-	    // Panel and items for dialog
-	    JTextField serverHostField = new JTextField(15);
-	    JTextField serverUsernameField = new JTextField(8);
-	    JTextField serverPortField = new JTextField(5);
-	    
-	    JTextField hostField = new JTextField(15);
-	    JTextField usernameField = new JTextField(8);
-	    JTextField portField = new JTextField(5);
+		// Panel and items for dialog
+		JTextField serverHostField = new JTextField(15);
+		JTextField serverUsernameField = new JTextField(8);
+		JTextField serverPortField = new JTextField(5);
 
-	    JPanel clientConnectionPanel = new JPanel();
-	    clientConnectionPanel.add(new JLabel("Host:"));
-	    clientConnectionPanel.add(hostField);
-	    clientConnectionPanel.add(Box.createHorizontalStrut(15)); // a spacer
-	    clientConnectionPanel.add(new JLabel("Username:"));
-	    clientConnectionPanel.add(usernameField);
-	    clientConnectionPanel.add(Box.createVerticalStrut(15)); // a spacer
-	    clientConnectionPanel.add(new JLabel("Port:"));
-	    clientConnectionPanel.add(portField);
-	    
-	    JPanel serverConnectionPanel = new JPanel();
-	    serverConnectionPanel.add(Box.createHorizontalStrut(15)); // a spacer
-	    serverConnectionPanel.add(new JLabel("Username:"));
-	    serverConnectionPanel.add(serverUsernameField);
-	    serverConnectionPanel.add(Box.createVerticalStrut(15)); // a spacer
-	    serverConnectionPanel.add(new JLabel("Port:"));
-	    serverConnectionPanel.add(serverPortField);
+		JTextField hostField = new JTextField(15);
+		JTextField usernameField = new JTextField(8);
+		JTextField portField = new JTextField(5);
 
-	    	    //overall layout
-	    JPanel main = new JPanel();
-	    main.setLayout(new BorderLayout());
+		JPanel clientConnectionPanel = new JPanel();
+		clientConnectionPanel.add(new JLabel("Host:"));
+		clientConnectionPanel.add(hostField);
+		clientConnectionPanel.add(Box.createHorizontalStrut(15)); // a spacer
+		clientConnectionPanel.add(new JLabel("Username:"));
+		clientConnectionPanel.add(usernameField);
+		clientConnectionPanel.add(Box.createVerticalStrut(15)); // a spacer
+		clientConnectionPanel.add(new JLabel("Port:"));
+		clientConnectionPanel.add(portField);
 
+		JPanel serverConnectionPanel = new JPanel();
+		serverConnectionPanel.add(Box.createHorizontalStrut(15)); // a spacer
+		serverConnectionPanel.add(new JLabel("Username:"));
+		serverConnectionPanel.add(serverUsernameField);
+		serverConnectionPanel.add(Box.createVerticalStrut(15)); // a spacer
+		serverConnectionPanel.add(new JLabel("Port:"));
+		serverConnectionPanel.add(serverPortField);
 
+		// overall layout
+		JPanel main = new JPanel();
+		main.setLayout(new BorderLayout());
 
-	    main.add(canvas1, BorderLayout.CENTER);
-	    main.add(buttonPanel, BorderLayout.SOUTH);
-	    main.add(filePanel, BorderLayout.NORTH);
+		main.add(canvas1, BorderLayout.CENTER);
+		main.add(buttonPanel, BorderLayout.SOUTH);
+		main.add(filePanel, BorderLayout.NORTH);
 
-	    JPanel serverWhiteBoardInterface = new JPanel();
+		JPanel serverWhiteBoardInterface = new JPanel();
 
+		JPanel entryPanel = new JPanel();
+		entryPanel.setLayout(null);
 
+		getContentPane().add(entryPanel, "ENTRYPANEL");
 
-	    JPanel entryPanel = new JPanel();
-	    entryPanel.setLayout(null);
+		JLabel lblWelcomeToThe = new JLabel("Welcome to the Shared Whiteboard");
+		lblWelcomeToThe.setBounds(445, 26, 462, 33);
+		lblWelcomeToThe.setFont(new Font("Lucida Grande", Font.PLAIN, 27));
+		entryPanel.add(lblWelcomeToThe);
 
-	    getContentPane().add(entryPanel, "ENTRYPANEL");
+		JButton connectButton = new JButton("Connect to a Whiteboard");
+		connectButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 
+				int result = JOptionPane.showConfirmDialog(null, clientConnectionPanel, "Enter your host and username",
+						JOptionPane.OK_CANCEL_OPTION);
 
+				System.out.println("username: " + usernameField.getText());
+				System.out.println("host: " + hostField.getText());
+				System.out.println("port: " + portField.getText());
 
-	    JLabel lblWelcomeToThe = new JLabel("Welcome to the Shared Whiteboard");
-	    lblWelcomeToThe.setBounds(445, 26, 462, 33);
-	    lblWelcomeToThe.setFont(new Font("Lucida Grande", Font.PLAIN, 27));
-	    entryPanel.add(lblWelcomeToThe);
+				if (result == JOptionPane.OK_OPTION) {
+					CardLayout cl = (CardLayout) (getContentPane().getLayout());
+					chatboxPanel.clientMode = true;
+					chatboxPanel.setClientGUI();
+					try {
+						String host = hostField.getText();
+						int port = Integer.parseInt(portField.getText());
+						Socket conn = new Socket(host, port);
+						// why do we need this for
+						DataInputStream din = new DataInputStream(conn.getInputStream());
+						DataOutputStream dout = new DataOutputStream(conn.getOutputStream());
 
-	    JButton connectButton = new JButton("Connect to a Whiteboard");
-	    connectButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
+						canvas1.addOutputStream(dout);
 
-	    	    int result = JOptionPane.showConfirmDialog(null, clientConnectionPanel,
-	    	            "Enter your host and username", JOptionPane.OK_CANCEL_OPTION);
+						// initialize chatboxPanel
+						ClientRunnable clir;
 
-	    	          System.out.println("username: " + usernameField.getText());
-	    	          System.out.println("host: " + hostField.getText());
-	    	          System.out.println("port: " + portField.getText());
+						// handle exception here (no contact with server or username taken
+						try {
+							clir = new ClientRunnable(conn, canvas1, usernameField.getText(), userPanel, container,
+									chatboxPanel);
 
-	    	        if (result == JOptionPane.OK_OPTION) {
-		    	       CardLayout cl = (CardLayout)(getContentPane().getLayout());
+						} catch (IllegalArgumentException ilex) {
+							// System.err.println("Error: Taken");
+							conn.close();
+							// JOptionPane.showMessageDialog(null, "Error: Username already taken");
+							return;
+						}
 
-	    	          try {
-	    	        	  String host = hostField.getText();
-	    	        	  int port = Integer.parseInt(portField.getText());
-	    	        	  Socket conn = new Socket(host, port);
-	    	        	  //why do we need this for
-	    	        	  DataInputStream din = new DataInputStream(conn.getInputStream());
-	    	        	  DataOutputStream dout = new DataOutputStream(conn.getOutputStream());
+						new Thread(clir).start();
+					} catch (IOException | IllegalArgumentException ex) {
+						JOptionPane.showMessageDialog(null,
+								"Error: Could not connect to server. Check the host and port number");
+						cl.show(content, "ENTRYPANEL");
+						return;
 
-	    	        	  canvas1.addOutputStream(dout);
+					}
 
-	    	        	  ClientRunnable clir;
-	    	        	  // handle exception here (no contact with server or username taken
-	    	        	  try {
-	    	        		clir = new ClientRunnable(conn, canvas1, usernameField.getText(), userPanel, container);
-	    	        		
-	    	        	  } catch (IllegalArgumentException ilex) {
-	    	        		  //System.err.println("Error: Taken");
-	    	        		  conn.close();
-	    	        		  //JOptionPane.showMessageDialog(null, "Error: Username already taken");
-	    	        		  return;
-	    	        	  }
+					filePanel.setVisible(false);
+					userPanel.setVisible(false);
+					cl.show(content, "SERVERPANEL");
 
-	    	        	  new Thread(clir).start();
-	    	          } catch (IOException | IllegalArgumentException ex) {  
-	    	        	  JOptionPane.showMessageDialog(null, "Error: Could not connect to server. Check the host and port number");
-	    	        	  cl.show(content, "ENTRYPANEL");
-	    	        	  return;
+				}
+			}
+		});
+		connectButton.setFocusable(false);
 
-	    	          }
-	    	          	    	          
- 	    	        filePanel.setVisible(false);
- 	    	        userPanel.setVisible(false);
-	  	    		cl.show(content, "SERVERPANEL");
+		connectButton.setBounds(596, 223, 208, 76);
+		entryPanel.add(connectButton);
 
-	    	        }
-	    	     }
-	    });
-	    connectButton.setFocusable(false);
+		JButton hostButton = new JButton("Host a Whiteboard");
+		hostButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				int result = JOptionPane.showConfirmDialog(null, serverConnectionPanel,
+						"Enter your username and port number", JOptionPane.OK_CANCEL_OPTION);
 
-	    connectButton.setBounds(596, 223, 208, 76);
-	    entryPanel.add(connectButton);
-
-	    JButton hostButton = new JButton("Host a Whiteboard");
-	    hostButton.addActionListener(new ActionListener() {
-	    	public void actionPerformed(ActionEvent e) {
-	    	    int result = JOptionPane.showConfirmDialog(null, serverConnectionPanel,
-	    	            "Enter your username and port number", JOptionPane.OK_CANCEL_OPTION);
-	    	   
-	    	    if (result == JOptionPane.OK_OPTION) {
-		    	    CardLayout cl = (CardLayout)(getContentPane().getLayout());
-	    	    	Server s = null;
-	    	    	//select port number
-		    	    try {
+				if (result == JOptionPane.OK_OPTION) {
+					CardLayout cl = (CardLayout) (getContentPane().getLayout());
+					Server s = null;
+					chatboxPanel.clientMode = false;
+					// select port number
+					try {
 						String username = serverUsernameField.getText();
 						int port = Integer.parseInt(serverPortField.getText());
-						s = new Server(canvas1, port, userPanel, username);
+						s = new Server(canvas1, port, userPanel, username, chatboxPanel);
 						server = s;
 						server.startServer();
+						System.out.println("server: "+username);
+						chatboxPanel.setServerUsername(username);
 
-		    	    } catch (IllegalArgumentException | IOException e1) {
-		    	    	JOptionPane.showMessageDialog(null, "Error: Invalid port number");
-		    	    	cl.show(content, "ENTRYPANEL");
-		    	    	return;
-		    	    }
+					} catch (IllegalArgumentException | IOException e1) {
+						JOptionPane.showMessageDialog(null, "Error: Invalid port number");
+						cl.show(content, "ENTRYPANEL");
+						return;
+					}
 					new Thread(server).start();
 
-					// TODO: handle port number in use exception
-
 					filePanel.setVisible(true);
-	 	    	    userPanel.setVisible(true);
-		    		cl.show(content, "SERVERPANEL");
-	    	    }
-	    	}
-	    });
+					userPanel.setVisible(true);
+					cl.show(content, "SERVERPANEL");
+				}
+			}
+		});
 
-	    hostButton.setFocusable(false);
+		hostButton.setFocusable(false);
 
-	    hostButton.setBounds(596, 311, 208, 76);
-	    entryPanel.add(hostButton);
-	    this.entryPanel = entryPanel;
+		hostButton.setBounds(596, 311, 208, 76);
+		entryPanel.add(hostButton);
+		this.entryPanel = entryPanel;
 
+		serverWhiteBoardInterface.add(main);
+		serverWhiteBoardInterface.add(sidePanel);
+		content.add(serverWhiteBoardInterface, "SERVERPANEL");
 
-	    serverWhiteBoardInterface.add(main);
-	    serverWhiteBoardInterface.add(sidePanel);
-	    content.add(serverWhiteBoardInterface, "SERVERPANEL");
+		// content.add(main, "MAINPANEL");
+		// content.add(sidePanel, "SIDEPANEL");
 
-	    //content.add(main, "MAINPANEL");
-	    //content.add(sidePanel, "SIDEPANEL");
+		this.pack();
+	}
 
-	    this.pack();
-    }
-    
 }

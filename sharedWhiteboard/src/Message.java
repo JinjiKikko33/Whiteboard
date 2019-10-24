@@ -1,3 +1,5 @@
+
+
 import java.awt.image.BufferedImage;
 
 import com.google.gson.Gson;
@@ -19,7 +21,7 @@ public class Message {
 // Circle 4
 // Clear (eraser) 5
 // Text 6
-// Chat 7
+// ChatMessage 7
 // Clear canvas 8
 // Open image 9
 
@@ -39,6 +41,8 @@ public class Message {
 
 	private boolean connectionDenied;
 	private String deniedMessage;
+	
+	private String chatMessage;
 	
 
 	// x and y coordinate of point
@@ -221,6 +225,14 @@ public class Message {
 
 	public void setConnectionDenied(boolean connectionDenied) {
 		this.connectionDenied = connectionDenied;
+	}
+	
+	public String getChatMessage() {
+		return chatMessage;
+	}
+
+	public void setChatMessage(String chatMessage) {
+	    this.chatMessage = chatMessage;
 	}
 
 }

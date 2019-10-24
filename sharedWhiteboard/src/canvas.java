@@ -1,5 +1,4 @@
 
-
 import java.io.Serializable;
 
 import javax.swing.JFrame;
@@ -13,5 +12,3 @@ public class canvas implements Serializable {
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
 }
-  
-

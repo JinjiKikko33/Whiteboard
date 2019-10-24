@@ -1,3 +1,5 @@
+
+
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.DataInputStream;
@@ -17,28 +19,28 @@ public class ServerRunnable implements Runnable {
 	PlayerList userPanel;
 	String username;
 	String managerUsername;
+	ChatBox chatWindow;
 
-	public ServerRunnable(Socket conn, shape canvas, PlayerList userPanel, String managerUsername) {
+	public ServerRunnable(Socket conn, shape canvas, PlayerList userPanel, String managerUsername, ChatBox chatWindow) {
 		this.canvas1 = canvas;
 		this.conn = conn;
 		this.userPanel = userPanel;
 		this.managerUsername = managerUsername;
+		this.chatWindow = chatWindow;
 	}
-
-
 
 	@Override
 	public void run() {
 		DataInputStream din = null;
 		DataOutputStream dout = null;
 
-
 		try {
-		 din = new DataInputStream(conn.getInputStream());
-		 dout = new DataOutputStream(conn.getOutputStream());
+			din = new DataInputStream(conn.getInputStream());
+			dout = new DataOutputStream(conn.getOutputStream());
+			chatWindow.addOutputStream(dout);
+
 		} catch (IOException e) {
 			System.err.println("ERROR: Could not initialize streams. Removing user");
-
 
 			ActiveConnections.endPoints.remove(conn);
 			ActiveConnections.SocketUsernameMap.remove(conn);
@@ -48,141 +50,152 @@ public class ServerRunnable implements Runnable {
 		}
 
 		while (true) {
-				if (conn.isClosed()) {
+			if (conn.isClosed()) {
+				return;
+			}
+
+			String request = null;
+			try {
+				request = din.readUTF();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				System.err.println("ERROR: Lost connection with client");
+				// e.printStackTrace();
+				try {
+					ActiveConnections.endPoints.remove(conn);
+					if (ActiveConnections.SocketUsernameMap.containsKey(username)) {
+						ActiveConnections.SocketUsernameMap.remove(username);
+						userPanel.deletePlayer(username);
+					}
+					conn.close();
+					return;
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+
+			Message m = Message.makeMessageFromJson(request);
+
+			// check username
+			if (m.getRequestType() == 10) {
+				String desiredName = m.getUsername();
+
+				if (desiredName.equals(managerUsername)) {
+					sendTakenUsernameMessage(dout);
 					return;
 				}
-			
-				String request = null;
-				try {
-					request = din.readUTF();
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					System.err.println("ERROR: Lost connection with client");
-					//e.printStackTrace();
-					try {
-						ActiveConnections.endPoints.remove(conn);
-						if (ActiveConnections.SocketUsernameMap.containsKey(username)) {
-							ActiveConnections.SocketUsernameMap.remove(username);
-							userPanel.deletePlayer(username);
-						}
-						conn.close();
-						return;
-					} catch (IOException e1) {
-						e1.printStackTrace();
-					}
-				} 
 
-				Message m = Message.makeMessageFromJson(request);
-			
+				for (String s : ActiveConnections.SocketUsernameMap.keySet()) {
 
-				// check username
-				if (m.getRequestType() == 10) {
-					String desiredName = m.getUsername();
-
-
-					if (desiredName.equals(managerUsername)) {
+					if (s.equals(desiredName)) {
 						sendTakenUsernameMessage(dout);
 						return;
 					}
-					
-					for (String s : ActiveConnections.SocketUsernameMap.keySet()) {
+				}
 
-						if (s.equals(desiredName))	{	
-							sendTakenUsernameMessage(dout);
-							return;
-						}
-					}
-					
-					//manager refuse connection
-					boolean isAccept = userPanel.acceptPopup(desiredName);
-					if (!isAccept) {
-						Message reply = new Message();
-						reply.setConnectionDenied(true);
-						reply.setDeniedMessage("refuse connection");
-						String strReply = Message.toJson(reply);
-						try {
-							dout.writeUTF(strReply);
-							conn.close();
-							ActiveConnections.endPoints.remove(conn);
-							return;
-						} catch (IOException e) {
-							e.printStackTrace();
-						}
-					}
-					
-					// username free
+				// manager refuse connection
+				boolean isAccept = userPanel.acceptPopup(desiredName);
+				if (!isAccept) {
 					Message reply = new Message();
-					ActiveConnections.SocketUsernameMap.put(desiredName, conn);
-					reply.setConnectionDenied(false);
-					
-					//update local username
-					username = desiredName;
-					
-					//update playerlist locally
-					userPanel.updatePlayerList(desiredName);
-					
-					// get bufImage and send
-					BufferedImage img = canvas1.getBufImage();
-					reply.setImg(canvas1.encodeString(img));
-					reply.setRequestType(shape.OPEN);
-
+					reply.setConnectionDenied(true);
+					reply.setDeniedMessage("refuse connection");
 					String strReply = Message.toJson(reply);
 					try {
 						dout.writeUTF(strReply);
-					} catch (IOException e) {
-						ActiveConnections.endPoints.remove(conn);
-						ActiveConnections.SocketUsernameMap.remove(username);
-						e.printStackTrace();
-					}
-
-					continue;
-
-				}
-
-				//System.out.println("IN LOOP: " + m);
-				
-				//check whether manager kick this client out
-				if(userPanel.isKickOut && username.equals(userPanel.removedUser)) {
-					Message deny = new Message();
-					deny.setConnectionDenied(true);
-					deny.setDeniedMessage("kick out");
-					String strDeny = Message.toJson(deny);
-					System.out.println(strDeny);
-					try {
-						dout.writeUTF(strDeny);
 						conn.close();
 						ActiveConnections.endPoints.remove(conn);
-						ActiveConnections.SocketUsernameMap.remove(username);
-						userPanel.isKickOut = false;
-
 						return;
-					}
-					catch (IOException e2) {
-						e2.printStackTrace();
-					}
-				}
-				
-				// draw locally
-				canvas1.drawServerShape(m);
-				
-				
-				//convert m to json string
-				// pass instruction to all non-originating clients
-				InetAddress addr = conn.getInetAddress();
-				for (Socket activeConnection : ActiveConnections.endPoints) {
-					if (activeConnection.getInetAddress() != addr) {
-						try {
-							DataOutputStream activeOut = new DataOutputStream(activeConnection.getOutputStream());
-							activeOut.writeUTF(request);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-							continue;
-						}
+					} catch (IOException e) {
+						e.printStackTrace();
 					}
 				}
+
+				// username free
+				Message reply = new Message();
+				ActiveConnections.SocketUsernameMap.put(desiredName, conn);
+				reply.setConnectionDenied(false);
+
+				// update local username
+				username = desiredName;
+
+				// update playerlist locally
+				userPanel.updatePlayerList(desiredName);
+
+				// get bufImage and send
+				BufferedImage img = canvas1.getBufImage();
+				reply.setImg(canvas1.encodeString(img));
+				reply.setRequestType(shape.OPEN);
+
+				String strReply = Message.toJson(reply);
+				try {
+					dout.writeUTF(strReply);
+				} catch (IOException e) {
+					ActiveConnections.endPoints.remove(conn);
+					ActiveConnections.SocketUsernameMap.remove(username);
+					e.printStackTrace();
+				}
+
+				continue;
+
+			}
+
+			// System.out.println("IN LOOP: " + m);
+
+			// check whether manager kick this client out
+			if (userPanel.isKickOut && username.equals(userPanel.removedUser)) {
+				Message deny = new Message();
+				deny.setConnectionDenied(true);
+				deny.setDeniedMessage("kick out");
+				String strDeny = Message.toJson(deny);
+				System.out.println(strDeny);
+				try {
+					dout.writeUTF(strDeny);
+					conn.close();
+					ActiveConnections.endPoints.remove(conn);
+					ActiveConnections.SocketUsernameMap.remove(username);
+					userPanel.isKickOut = false;
+					return;
+				} catch (IOException e2) {
+					e2.printStackTrace();
+				}
+			}
+
+			String senderName = null;
+
+			// read from chat message
+
+			System.out.println(m.getRequestType() + " m.requesttype");
+			if (m.getRequestType() == 7) {
+				senderName = m.getUsername();
+				String msg = m.getChatMessage();
+				System.out.println(msg + " msg");
+				chatWindow.updateChat(senderName + " : " + msg);
+			}
+
+
+
+			// draw locally
+			System.out.println(m.getRequestType() + " drawservershape");
+			canvas1.drawServerShape(m);
+
+			// convert m to json string
+			// pass instruction to all non-originating clients
+			InetAddress addr = conn.getInetAddress();
+			for (Socket activeConnection : ActiveConnections.endPoints) {
+				if (activeConnection.getInetAddress() != addr) {
+					try {
+						DataOutputStream activeOut = new DataOutputStream(activeConnection.getOutputStream());
+						activeOut.writeUTF(request);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						continue;
+					}
+				}
+			}
 		}
 	}
+
 	private void sendTakenUsernameMessage(DataOutputStream dout) {
 		Message reply = new Message();
 		reply.setConnectionDenied(true);
@@ -196,7 +209,5 @@ public class ServerRunnable implements Runnable {
 			e.printStackTrace();
 		}
 	}
-	
-	
-	
+
 }

@@ -2,38 +2,41 @@
 import java.net.*;
 import java.io.*;
 
-public class Server implements Runnable{
+public class Server implements Runnable {
 
 	shape canvas1;
 	PlayerList userPanel;
 	int port;
 	boolean active;
 	ServerSocket server;
+	//try make it static
 	String username;
+	ChatBox chatWindow;
 
-	public Server(shape c, int port, PlayerList userPanel, String username) {
+	public Server(shape c, int port, PlayerList userPanel, String username, ChatBox chatWindow) {
 		this.canvas1 = c;
 		canvas1.clientMode = false;
-		
+
 		this.port = port;
 		this.userPanel = userPanel;
 		this.active = true;
 		this.username = username;
-		
+		this.chatWindow = chatWindow;
+
 	}
-	
+
 	public void setActive(boolean status) {
 		this.active = status;
 	}
-	
-	
+
 	public void close() {
 		try {
 			this.server.close();
-		} catch (IOException e) {}
+		} catch (IOException e) {
+		}
 	}
-	
-	public void startServer() throws IOException{
+
+	public void startServer() throws IOException {
 		ServerSocket server = null;
 		server = new ServerSocket(port);
 		this.server = server;
@@ -48,12 +51,10 @@ public class Server implements Runnable{
 		while (active) {
 			Socket conn;
 			try {
-			conn = server.accept();
-			//TODO: Accept or deny new user here and check username
+				conn = server.accept();
+				// TODO: Accept or deny new user here and check username
 
-			System.out.println("New socket opened to " + conn.getInetAddress() + " on port "
-					+ port);
-
+				System.out.println("New socket opened to " + conn.getInetAddress() + " on port " + port);
 
 			} catch (IOException e) {
 				System.out.println("ERROR: Cannot establish a connection");
@@ -64,16 +65,12 @@ public class Server implements Runnable{
 			// Add the connection to the list of active connections
 			// TODO: Delete if connection lost
 			ActiveConnections.endPoints.add(conn);
-			
-			//TODO: Implement ConnectionRunnable to accept requests and draw on canvas
-			new Thread(new ServerRunnable(conn, canvas1, userPanel, username)).start();
 
+			// TODO: Implement ConnectionRunnable to accept requests and draw on canvas
+			new Thread(new ServerRunnable(conn, canvas1, userPanel, username, chatWindow)).start();
 
 		}
 
-
 	}
-
-
 
 }

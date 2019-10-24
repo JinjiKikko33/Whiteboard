@@ -1,3 +1,5 @@
+
+
 import java.awt.BorderLayout;
 import javax.swing.DefaultListModel;
 import java.awt.Color;
@@ -72,9 +74,13 @@ public class PlayerList extends JPanel{
 		submit.addActionListener(new ActionListener(){
 	    	public void actionPerformed(ActionEvent e){
 	    		if(index>=0) {
+	    			System.out.println("index: "+index);
 	    			removedUser = model.elementAt(index);
 	    			model.removeElement(removedUser);
 	    			isKickOut = true;
+	    		}else {
+	    			JOptionPane.showMessageDialog(null,
+	    				    "Please select a valid user to remove!");
 	    		}
 	    	}
 	    });
